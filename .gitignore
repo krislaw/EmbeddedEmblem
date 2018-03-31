@@ -81,6 +81,7 @@ dkms.conf
 *.png
 *.xls
 *.iex
+*.png
 
 #Hardware
 *.sch
