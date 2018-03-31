@@ -80,6 +80,7 @@ dkms.conf
 *.exe
 *.png
 *.xls
+*.iex
 
 #Hardware
 *.sch
