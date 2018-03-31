@@ -67,7 +67,7 @@ dkms.conf
 *.uvproj
 *.plg
 *.tra
-bin
+*.bin
 *.elf
 *.swo
 *.swp
