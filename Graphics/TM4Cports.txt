@@ -1,0 +1,60 @@
+Remove these resistors on the board:
+PD0 ={R9}= PB6, PD1 ={R10}= B7
+
+The CC3100 can just be attached on the back of the TM4C
+
+=========== CC3100 ============ http://www.ti.com/lit/ug/swru371b/swru371b.pdf
+PB0: cc3100 uart1 tx
+PB1: cc3100 uart1 rx
+PB2: cc3100 IRQ
+PB4: cc3100 spi clk
+PB6: cc3100 spi miso
+PB7: cc3100 spi mosi
+
+PC4: cc3100 uart1 cts
+PC5: cc3100 uart1 rts
+PC7: cc3100 nwp log tx
+
+PD6: cc3100 wlan log tx
+
+PE4: cc3100 nHIB
+
+P30: cc3100 SPI_CS
+RST: cc3100 nRST
+
+============== LCD ============
+PA2: LCD sclk
+PA3: LCD tft_cs
+PA4: LCD miso
+PA5: LCD mosi
+PA6: LCD data
+PA7: LCD rst
+
+============ Unused ===============
+PB3 
+PB5
+
+PC6
+
+============ Audio on SSI3 ========
+PD0:   SSI3 CLK
+PD1:   SSI3 FSS
+PD2:   SSI3 RX (unconnected)
+PD3:   SSI3 TX
+PD7:
+
+============ Standard IO =========
+PE1: ADC for Joystick (Y) / B Up
+PE2: ADC for Joystick (X) / B Down
+PE3: B Left
+PE5: B Right
+
+PF0: Button1 //B
+PF1: LED1 (Red)
+PF2: LED2 (Blue)
+PF3: LED3 (Green)
+PF4: Button2 //A
+
+
+
+

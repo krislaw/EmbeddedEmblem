@@ -1,0 +1,18 @@
+Design Consistency Status Report
+--------------------------------
+
+Report File:        C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_LawtonDarnell (PCB - Design Consistency Status Report).txt
+Report Written:     Monday, March 19, 2018
+Design Path:        C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_LawtonDarnell.pcb
+Design Title:       
+Created:            3/19/2018 2:09:34 PM
+Last Saved:         3/19/2018 3:12:52 PM
+Editing Time:       32 min
+Units:              inches (precision 3)
+
+
+Checking integrity of Schematic "C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_LawtonDarnell.sch" with PCB "C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_LawtonDarnell.pcb"
+==================================================================================================================================================================================================================
+
+
+End Of Report.

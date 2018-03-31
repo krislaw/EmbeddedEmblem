@@ -1,0 +1,70 @@
+Forward Design Changes Report
+-----------------------------
+
+Report File:        C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_LawtonDarnell (PCB - Forward Design Changes Report).txt
+Report Written:     Monday, March 19, 2018
+Design Path:        C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_LawtonDarnell.pcb
+Design Title:       
+Created:            3/19/2018 2:09:34 PM
+Last Saved:         3/19/2018 3:12:52 PM
+Editing Time:       32 min
+Units:              inches (precision 3)
+
+Disconnected pin "U1-28" from net "N0700".
+Disconnected pin "U1-29" from net "N0698".
+Disconnected pin "D2-2" from net "N0701".
+Disconnected pin "D3-2" from net "N0699".
+Disconnected pin "R4-1" from net "N0698".
+Disconnected pin "R4-2" from net "N0699".
+Disconnected pin "R5-1" from net "N0700".
+Disconnected pin "R5-2" from net "N0701".
+
+Deleted component reference "R4".
+Deleted component reference "R5".
+
+Deleted net "N0698".
+Deleted net "N0699".
+Deleted net "N0700".
+Deleted net "N0701".
+
+Added net "N0703".
+Added net "N0704".
+Added net "N0705".
+Added net "N0706".
+
+Error: Unable to add component reference "Gnd" of component "Testpoint_TwoHole", package "DIL" because No PCB information for Component "Testpoint_TwoHole"..
+Error: Unable to add component reference "Gnd3" of component "Testpoint_TwoHole", package "DIL" because No PCB information for Component "Testpoint_TwoHole"..
+Error: Unable to add component reference "TP2" of component "Testpoint_TwoHole", package "DIL" because No PCB information for Component "Testpoint_TwoHole"..
+Error: Unable to add component reference "TP1" of component "Testpoint_TwoHole", package "DIL" because No PCB information for Component "Testpoint_TwoHole"..
+Added component reference "R25" of component "0.25Wresistor", package "DIP".
+Changed value "V" on component reference "R25" to "1k".
+Added value "Manufacturer=" to component reference "R25".
+
+Added value "Manufacturer Part Number=" to component reference "R25".
+
+Added value "Distributor=" to component reference "R25".
+
+Added value "Distributor Part Number=" to component reference "R25".
+
+Added component reference "R26" of component "0.25Wresistor", package "DIP".
+Changed value "V" on component reference "R26" to "1k".
+Added value "Manufacturer=" to component reference "R26".
+
+Added value "Manufacturer Part Number=" to component reference "R26".
+
+Added value "Distributor=" to component reference "R26".
+
+Added value "Distributor Part Number=" to component reference "R26".
+
+
+Connected pin "U1-29" to net "N0703".
+Connected pin "U1-28" to net "N0704".
+Connected pin "D2-2" to net "N0706".
+Connected pin "D3-2" to net "N0705".
+Connected pin "R25-1" to net "N0703".
+Connected pin "R25-2" to net "N0705".
+Connected pin "R26-1" to net "N0704".
+Connected pin "R26-2" to net "N0706".
+
+
+End Of Report.

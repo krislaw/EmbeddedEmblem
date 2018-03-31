@@ -1,0 +1,17 @@
+Forward Design Changes Report
+-----------------------------
+
+Report File:        C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_TM4C123starter (PCB - Forward Design Changes Report).txt
+Report Written:     Monday, March 26, 2018
+Design Path:        C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_TM4C123starter.pcb
+Design Title:       
+Created:            1/29/2013 12:01:41 AM
+Last Saved:         3/26/2018 1:38:47 PM
+Editing Time:       1383 min
+Units:              mil (precision 0)
+
+Renamed component reference "D1" to "D1".
+
+
+
+End Of Report.

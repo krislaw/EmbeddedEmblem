@@ -1,0 +1,19 @@
+Transfer from Schematic to PCB.
+-------------------------------
+
+Report File:        C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_LawtonDarnell (PCB - Transfer from Schematic to PCB.).txt
+Report Written:     Monday, March 19, 2018
+Design Path:        C:\Users\Kristen\Documents\College\445L\REPO\Lab7\PCBArtist\Lab7_LawtonDarnell.pcb
+Design Title:       
+Created:            3/19/2018 2:09:34 PM
+Last Saved:         3/19/2018 2:10:04 PM
+Editing Time:       0 min
+Units:              inches (precision 3)
+
+Could not load component "Testpoint_TwoHole" package "DIL" into target design.
+Could not add "Gnd" component "Testpoint_TwoHole" package "DIL" to target design.
+Could not add "Gnd3" component "Testpoint_TwoHole" package "DIL" to target design.
+Could not add "TP2" component "Testpoint_TwoHole" package "DIL" to target design.
+Could not add "TP1" component "Testpoint_TwoHole" package "DIL" to target design.
+
+End Of Report.
