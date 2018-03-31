@@ -77,7 +77,8 @@ dkms.conf
 *.pcb
 
 #Valvanoware
-CC3100*
+CC3100/
+CC3100_docs/
 
 #Windows Junk
 *.exe
