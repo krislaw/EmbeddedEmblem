@@ -6,7 +6,7 @@
 #include "Instruments.h"
 
 
-#include "..//inc//tm4c123gh6pm.h"
+#include "inc/tm4c123gh6pm.h"
 #include "Timer0A.h"
 #include "Timer1A.h"
 #include "Timer2A.h"

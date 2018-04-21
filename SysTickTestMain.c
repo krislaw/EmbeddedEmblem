@@ -27,8 +27,8 @@
  */
 
 #include <stdint.h>
-#include "..//inc//tm4c123gh6pm.h"
-#include "..//inc//ST7735.h"
+#include "inc//tm4c123gh6pm.h"
+#include "inc//ST7735.h"
 #include "PLL.h"
 #include "SysTick.h"
 

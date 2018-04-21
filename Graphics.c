@@ -1,5 +1,5 @@
 #include "Graphics.h"
-#include "../inc/ST7735.h"
+#include "inc/ST7735.h"
 
 #include "HardCoded.h"
 //#include "Sprites.h"
