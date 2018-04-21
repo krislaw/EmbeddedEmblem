@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #include <stdint.h>
 #include "GameController.h"
 #include "Graphics.h"
@@ -85,6 +84,21 @@ void EmptyFunc(){
 	return;
 }
 
+uint16_t IdToVector(uint16_t id){ //id for indexes to vector for alive/moved reg
+	uint16_t ret;
+	switch(id) {
+		case 0: ret = 0x1; break;
+		case 1: ret = 0x2; break;
+		case 2: ret = 0x4; break;
+		case 3: ret = 0x8; break;
+		case 4: ret = 0x10; break;
+		case 5: ret = 0x20; break;
+		case 6: ret = 0x40; break;
+		case 7: ret = 0x80; break;
+	}
+	return ret;
+}
+
 void UndoState(){
 	//clear any between state flags
 	switch(currentState->StateNum){
@@ -117,31 +131,6 @@ void NextState(){
 	}
 }
 
-/* ======= FUNCTIONS FOR MAP & MAP STATES =============*
-* UpdateCursor(dX, dY), UpdateInfoScreen(character id)
-* scanMap: onA
-*/
-
-void UpdateCursor(int8_t dX, int8_t dY){
-	PrintTile(mapX, mapY);
-	//check if move tiles are active, reprint if applicable
-	//check character position, reprint if applicatble
-	
-	if(mapX == Xmin && dX < 0){ mapX = Xmin; }
-	else if(mapX == Xmax && dX > 0){ mapX = Xmax; }
-	else{mapX = mapX + dX; }
-	
-	if(mapY == Ymin && dY < 0){ mapY = Ymin; }
-	else if(mapY == Ymax && dY > 0){ mapY = Ymax; }
-	else{mapY = mapY + dY; }
-}
-
-void UpdateInfoScreen(uint8_t id){
-		ShowInfo(units[id].name, id, units[id].lvl,
-			units[id].HP, units[id].MHP, units[id].ATK, units[id].DEF,
-			units[id].RES, units[id].SPD);
-}
-
 /* checkLose state - finished, TEST */
 void CheckLose(){
 	if((alive & pcVector) == 0){
@@ -162,6 +151,34 @@ void CheckWin(){
 	else{
 		NextState();
 	}
+}
+
+/* ======= FUNCTIONS FOR MAP & MAP STATES =============*
+* UpdateCursor(dX, dY), UpdateInfoScreen(character id)
+* scanMap: onA, onScroll
+* charSelected: checkValidAction (A), TentativeMove (Scroll),
+* charActionState: SelectAttack Target (A), ChangeAttackTarget (Scroll), Calculate Combat for preview
+* waitForEnemy: idle and wait for the server i guess
+*/
+
+void UpdateCursor(int8_t dX, int8_t dY){
+	PrintTile(mapX, mapY);
+	//check if move tiles are active, reprint if applicable
+	//check character position, reprint if applicatble
+	
+	if(mapX == Xmin && dX < 0){ mapX = Xmin; }
+	else if(mapX == Xmax && dX > 0){ mapX = Xmax; }
+	else{mapX = mapX + dX; }
+	
+	if(mapY == Ymin && dY < 0){ mapY = Ymin; }
+	else if(mapY == Ymax && dY > 0){ mapY = Ymax; }
+	else{mapY = mapY + dY; }
+}
+
+void UpdateInfoScreen(uint8_t id){
+		ShowInfo(units[id].name, id, units[id].lvl,
+			units[id].HP, units[id].MHP, units[id].ATK, units[id].DEF,
+			units[id].RES, units[id].SPD);
 }
 
 void ScanMapA(){
@@ -281,7 +298,6 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 		}
 		if(damage == 0) { damage = 1; } //can't take 0 damage
 		
-		
 }
 
 void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
@@ -297,22 +313,36 @@ void ChangeAttackTarget(){
 	CalculateCombat(attackerId, defenderId);
 }
 
-void SelectAttackTarget(){
-	//use character from change attack target
+void SelectAttackTarget(){ //confirm the attack
 	uint16_t attackerId;
 	uint16_t defenderId;
 	
 	ResolveCombat(attackerId, defenderId);
-	
 	//do combat animations??
 }
 
-//TODO: need to make DEEP COPIES of the starting units so that HP can be updated
-
-void DeepCopyUnitFromSource(uint16_t idNumber, uint16_t source){
-	
+void PrintMapAll(){
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			PrintTile(i, j);
+		}
+	}
+	for(int i = 0; i < numCharacters; i++){
+		PrintSprite(units[i].id, unitXLocations[i], unitYLocations[i]);
+	}
+	UpdateInfoScreen(3);	
 }
-void GenerateTeam(void){ //hard coded team until team builder is completed
+
+/* =========== END MAP FUNCTIONS =============*/
+
+/* ======= FUNCTIONS FOR TEAMBUILDER =============*
+* GenerateTeam, GenerateMap for a hard-coded quickstart 
+* selectTeam: TODO
+* previewStats: shows info screen & asks u to confirm ur choice
+* addToTeam: TODO
+*/
+
+void GenerateTeam(void){ //hard coded player and enemy team
 	units[0] = protagonists[0];
 	units[1] = protagonists[1];
 	units[2] = protagonists[5];
@@ -326,6 +356,8 @@ void GenerateTeam(void){ //hard coded team until team builder is completed
 	setCharacterGraphics(3, (uint16_t *) &mmage1, (uint16_t *) &mmage1, (uint16_t *) &mmage1face);
 	setCharacterGraphics(4, (uint16_t *) &massassin1, (uint16_t *) &massassin1, (uint16_t *) &massasin1face);
 	setCharacterGraphics(5, (uint16_t *) &marmor1, (uint16_t *) &marmor1, (uint16_t *) &marmor1face);
+	
+	numCharacters = 6;
 }
 
 void GenerateMap(void) { //hard coded map until map select is complete
@@ -390,6 +422,8 @@ void RunGame(){
 	//SelectMap();
 	GenerateMap();
 	
+	PrintMapAll();
+	
 	currentState = &scanMap;
 	
 	while(1){
@@ -436,7 +470,7 @@ const struct State selectTeam = {0, &NextState, &EmptyFunc, &TeambuildScroll };
 const struct State previewStats = {1, &NextState, &UndoState, &EmptyFunc };
 const struct State addToTeam = {2, &NextState, &EmptyFunc, &EmptyFunc };
 
-const struct State viewTutorial; //push B from the chooseMap screen
+const struct State viewTutorial; //push B from the chooseMap screen, TODO: select map screen
 const struct State chooseMap;
 const struct State initializeMap;
 
@@ -445,4 +479,6 @@ const struct State charSelected = {4, &CheckValidAction, &UndoState, &TentativeM
 const struct State charActionState = {5, &SelectAttackTarget, &UndoState, &ChangeAttackTarget};
 const struct State checkWin = {6, &EmptyFunc, &EmptyFunc, &EmptyFunc };
 const struct State waitForEnemy = {7, &EmptyFunc, &EmptyFunc, &EmptyFunc };
-const struct State checkLose = {8, &EmptyFunc, &EmptyFunc, &EmptyFunc}; 
+const struct State checkLose = {8, &EmptyFunc, &EmptyFunc, &EmptyFunc};
+
+/* End State Machine */
