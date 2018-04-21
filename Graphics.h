@@ -10,7 +10,7 @@
 #define TileArraySize 48 //16 * 16 tiles
 #define SpriteWidth 15
 #define SpriteHeight 25
-#define SpriteArraySize (15*25)
+#define SpriteArraySize 375
 
 void GraphicsInit(void);
 
@@ -19,7 +19,7 @@ void ShowMap(void);
 void PrintTile(int tilex, int tiley);
 void PrintCursor(uint16_t x, uint16_t y);
 
-void setCharacterGraphics(uint8_t id, uint16_t* sprite1, uint16_t* sprite2, uint16_t* portrait);
+void SetCharacterGraphics(uint8_t id, uint16_t* sprite1, uint16_t* sprite2, uint16_t* portrait);
 void PrintSprite(uint8_t id, uint16_t x, uint16_t y);
 
 void ShowStartupScreen(void);

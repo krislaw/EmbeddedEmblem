@@ -27,7 +27,7 @@ struct State{
 struct Unit{
 	uint8_t id; //used for loading graphics, moving, ect.
 	uint8_t lvl;
-	char name[6];
+	char* name;
 	uint8_t weapon;
 	uint16_t MHP; //max hp
 	uint16_t HP;
@@ -55,7 +55,7 @@ const struct Unit villains[6] = { //TODO: add lance options
 	{3, 1, "", staff, 16, 16, 12, 6, 12, 8, 2},			//mcleric1
 	{3, 1, "", tome, 13, 13, 16, 10, 11, 10, 2},			//mmage1
 	{3, 1, "", sword, 17, 17, 18, 6, 6, 15, 2},			//mthief1
-	{3, 1, "", sword, 15, 15, 18, 6, 6, 6, 2}				//mASSasin1 i forgot an s okay sue me
+	{3, 1, "", sword, 15, 15, 18, 6, 6, 6, 2}				//mASSassin1
 };
 
 const char villainNames[30][6] = { //randomly generate villain names, shoutout to SEC Eweek 2018 for theme

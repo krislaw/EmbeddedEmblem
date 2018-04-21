@@ -231,15 +231,29 @@ void TentativeMove(){
 	//reprint cursor
 }
 
+//Preview values calculated from combat
+uint16_t defenderNewHP;
+uint16_t attackerNewHP; 
+
 void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
-		//calculate the damage done
-		uint16_t damage = units[attackerId].ATK;
+	//damage done to each unit
+	uint16_t damage = units[attackerId].ATK;
+	uint16_t recoil = units[defenderId].ATK;
 		switch(units[attackerId].weapon){
 			case tome:
 				damage-= units[defenderId].RES;
 				break;
 			case staff:
 				damage-= units[defenderId].RES;
+			break;
+			default: damage-= units[defenderId].DEF;
+		}
+		switch(units[defenderId].weapon){
+			case tome:
+				recoil-= units[attackerId].RES;
+				break;
+			case staff:
+				recoil-= units[attackerId].RES;
 			break;
 			default: damage-= units[defenderId].DEF;
 		}
@@ -250,22 +264,27 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 			case sword:
 				if(units[defenderId].weapon == lance){
 					damage = (damage * 3)/4;
+					recoil = (damage * 3)/2;
 				}
 				if(units[defenderId].weapon == axe){
 					damage = (damage * 3)/2;
+					recoil = (recoil * 3)/4;
 				}
 				break;
 			case lance:
 				if(units[defenderId].weapon == axe){
 					damage = (damage * 3)/4;
+					recoil = (damage * 3)/2;
 				}
 				if(units[defenderId].weapon == sword){
 					damage = (damage * 3)/2;
+					recoil = (recoil * 3)/4;
 				}
 				break;
 			case axe:
 				if(units[defenderId].weapon == sword){
 					damage = (damage * 3)/4;
+					recoil = (damage * 3)/2;
 				}
 				if(units[defenderId].weapon == lance){
 					damage = (damage * 3)/2;
@@ -274,34 +293,69 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 			case armor:
 				if(units[defenderId].weapon == tome){
 					damage = (damage * 3)/4;
+					recoil = (damage * 3)/2;
 				}
 				if(units[defenderId].weapon == staff){
 					damage = (damage * 3)/2;
+					recoil = (recoil * 3)/4;
 				}
 				break;
 			case tome:
 				if(units[defenderId].weapon == staff){
 					damage = (damage * 3)/4;
+					recoil = (damage * 3)/2;
 				}
 				if(units[defenderId].weapon == armor){
 					damage = (damage * 3)/2;
+					recoil = (recoil * 3)/4;
 				}
 				break;
 			case staff:
 				if(units[defenderId].weapon == armor){
 					damage = (damage * 3)/4;
+					recoil = (damage * 3)/2;
 				}
 				if(units[defenderId].weapon == tome){
 					damage = (damage * 3)/2;
+					recoil = (recoil * 3)/4;
 				}
 				break;
 		}
-		if(damage == 0) { damage = 1; } //can't take 0 damage
+		if(damage == 0) { damage = 1; } //can't take 0 damage, 0 recoil is ok
 		
+		//hp remaining after the combat
+		defenderNewHP = units[defenderId].HP;
+		attackerNewHP = units[attackerId].HP;
+		if(damage > defenderNewHP) { defenderNewHP = 0; }
+		else{ defenderNewHP-=damage;
+			if(recoil > attackerNewHP){
+				attackerNewHP = 0;
+				//TODO: print warning that the unit will die
+			}
+			else{
+				attackerNewHP-=recoil;
+			}
+		}
+		
+		return;
 }
 
 void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
-		//commit changes from calculated combat
+	//commit changes from calculated combat
+	units[attackerId].HP = attackerNewHP;
+	units[defenderId].HP = defenderNewHP;
+	
+	//mark the dead
+	if(attackerNewHP == 0) {
+		alive &= ~IdToVector(attackerId); 
+		PrintTile(unitXLocations[attackerId], unitYLocations[attackerId]);
+		PrintTile(unitXLocations[attackerId], unitYLocations[attackerId] - 1);
+	}
+	if(defenderNewHP == 0) {
+		alive &= ~IdToVector(defenderId); 
+		PrintTile(unitXLocations[defenderId], unitYLocations[defenderId]);
+		PrintTile(unitXLocations[defenderId], unitYLocations[defenderId] - 1);
+	}
 }
 
 void ChangeAttackTarget(){
@@ -343,19 +397,19 @@ void PrintMapAll(){
 */
 
 void GenerateTeam(void){ //hard coded player and enemy team
-	units[0] = protagonists[0];
-	units[1] = protagonists[1];
-	units[2] = protagonists[5];
-	units[3] = villains[0];
-	units[4] = villains[1];
-	units[5] = villains[5];
+	units[0] = protagonists[0]; units[0].id = 0;
+	units[1] = protagonists[1]; units[1].id = 1;
+	units[2] = protagonists[5]; units[2].id = 2;
+	units[3] = villains[0]; units[3].id = 3; units[3].name = (char*) villainNames[12];
+	units[4] = villains[1]; units[4].id = 4; units[3].name = (char*) villainNames[12];
+	units[5] = villains[5]; units[5].id = 5; units[3].name = (char*) villainNames[12];
 	
-	setCharacterGraphics(0, (uint16_t *) &slance1, (uint16_t *) &slance2, (uint16_t *) &slance1face);
-	setCharacterGraphics(1, (uint16_t *) &slance3, (uint16_t *) &slance3, (uint16_t *) &slance3face);
-	setCharacterGraphics(2, (uint16_t *) &ssword3, (uint16_t *) &ssword3, (uint16_t *) &ssword3face);
-	setCharacterGraphics(3, (uint16_t *) &mmage1, (uint16_t *) &mmage1, (uint16_t *) &mmage1face);
-	setCharacterGraphics(4, (uint16_t *) &massassin1, (uint16_t *) &massassin1, (uint16_t *) &massasin1face);
-	setCharacterGraphics(5, (uint16_t *) &marmor1, (uint16_t *) &marmor1, (uint16_t *) &marmor1face);
+	SetCharacterGraphics(0, (uint16_t *) &slance1, (uint16_t *) &slance2, (uint16_t *) &slance1face);
+	SetCharacterGraphics(1, (uint16_t *) &slance3, (uint16_t *) &slance3, (uint16_t *) &slance3face);
+	SetCharacterGraphics(2, (uint16_t *) &ssword3, (uint16_t *) &ssword3, (uint16_t *) &ssword3face);
+	SetCharacterGraphics(3, (uint16_t *) &mmage1, (uint16_t *) &mmage1, (uint16_t *) &mmage1face);
+	SetCharacterGraphics(4, (uint16_t *) &massassin1, (uint16_t *) &massassin1, (uint16_t *) &massasin1face);
+	SetCharacterGraphics(5, (uint16_t *) &marmor1, (uint16_t *) &marmor1, (uint16_t *) &marmor1face);
 	
 	numCharacters = 6;
 }
@@ -369,13 +423,13 @@ void GenerateMap(void) { //hard coded map until map select is complete
 			unitsOnMap[i][j] = -1;
 		}
 	}
-	unitXLocations[0] = 0; unitYLocations[0] = 7; unitsOnMap[0][7] = 0;
-	unitXLocations[1] = 1; unitYLocations[1] = 7; unitsOnMap[1][7] = 1;
-	unitXLocations[2] = 0; unitYLocations[2] = 6; unitsOnMap[0][6] = 2;
+	unitXLocations[0] = Xmin; unitYLocations[0] = Ymax; unitsOnMap[Xmin][Ymax] = 0;
+	unitXLocations[1] = Xmin; unitYLocations[1] = Ymin; unitsOnMap[Xmin][Ymin] = 1;
+	unitXLocations[2] = Xmin; unitYLocations[2] = 4; unitsOnMap[Xmin + 1][4] = 2;
 	
-	unitXLocations[3] = 6; unitYLocations[3] = 0; unitsOnMap[6][0] = 3;
-	unitXLocations[4] = 7; unitYLocations[4] = 0; unitsOnMap[7][0] = 4;
-	unitXLocations[5] = 7; unitYLocations[5] = 1; unitsOnMap[7][1] = 5;
+	unitXLocations[3] = Xmax; unitYLocations[3] = Ymax; unitsOnMap[Xmax][Ymax] = 3;
+	unitXLocations[4] = Xmax; unitYLocations[4] = Ymin; unitsOnMap[Xmax][Ymin] = 4;
+	unitXLocations[5] = Xmax; unitYLocations[5] = 3; unitsOnMap[Xmax - 1][3] = 5;
 }
 
  // TODO: Team Builder 

@@ -488,7 +488,4 @@ void ST7735_uBinOut6(uint32_t n);
 void ST7735_sDecOut0(int32_t n);
 void ST7735_uDecOut0(uint32_t n);
 int32_t ST7735_PlotGetX(void);
-/* Added by Kris to Valvanoware */
-// see draw bitmap, ignores green pixels for transparency in an image
-void ST7735_DrawBitmapTransp(int16_t x, int16_t y, const uint16_t *image, int16_t w, int16_t h);
 #endif

@@ -135,9 +135,10 @@ int main(void){
   while((SYSCTL_PRGPIO_R & 0x00000020) == 0){};
   GPIO_PORTF_DIR_R |= 0x0E;     // PF3,PF2,PF1 outputs
   GPIO_PORTF_DEN_R |= 0x0E;     // enable digital I/O on PF3,PF2,PF1  
+
+	//EnableInterrupts();
+	DisableInterrupts(); //we out here testin'
 		
-	EnableInterrupts();
-	
 	ClearButtonPush(); //ignore presses during setup
 	while(GetButtonPush == 0){ }
 	

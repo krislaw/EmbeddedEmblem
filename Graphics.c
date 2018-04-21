@@ -8,17 +8,17 @@
 const uint16_t * currentMap;
 uint16_t ** charSprites;
 uint8_t animate;
-uint16_t * charSpritesA[8];
-uint16_t * charSpritesB[8];
-uint16_t * charPortraits[8];
+uint16_t* charSpritesA[8];
+uint16_t* charSpritesB[8];
+uint16_t* charPortraits[8];
 
 void GraphicsInit(){ Output_Init(); }
 
 //input: character id, 2 25x15 sprites and 1 32x32 portrait
-void setCharacterGraphics(uint8_t id, uint16_t* sprite1, uint16_t* sprite2, uint16_t* portrait){
-	charSprites[id] = sprite1;
+void SetCharacterGraphics(uint8_t id, uint16_t* sprite1, uint16_t* sprite2, uint16_t* portrait){
 	charSpritesA[id] = sprite1;
 	charSpritesB[id] = sprite2;
+	//charSprites[id] = charSpritesA; //switch between A,B for idle animation
 	animate = 0;
 	charPortraits[id] = portrait;
 }
@@ -56,17 +56,23 @@ void PrintTile(int x, int y){ //print a map tile
 
 
 
-#define SpriteYOffset 47
-#define transparency 0x4D84
+#define SpriteYOffset 22 //32 + 16 - 25
+#define SpriteHeight 25
+#define SpriteWidth 15
+#define BgColor 0x4D84
 
 void PrintSprite(uint8_t id, uint16_t x, uint16_t y){ //which sprite to print and where 
-//	uint16_t sprite[SpriteArraySize];
+
 	uint16_t xs = (x * 16);
 	uint16_t ys = (y * 16) + SpriteYOffset;
 	
-	for(uint16_t i = 0; i < SpriteHeight; i++){
+	int k = 0;
+	for(int i = 0; i < SpriteHeight; i++){
 		for(int j = 0; j < SpriteWidth; j++){
-			ST7735_DrawPixel(xs + i, ys + j, charSprites[id][j*i + j]);
+			if(charSpritesA[id][k] != BgColor){
+				ST7735_DrawPixel(xs + j, ys + (SpriteHeight - i), charSpritesA[id][k]);
+			}
+			k++;
 		}
 	}
 }
