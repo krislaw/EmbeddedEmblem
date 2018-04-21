@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include <stdint.h>
 #include "GameController.h"
 #include "Graphics.h"
@@ -238,14 +239,44 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 				}
 				break;
 			case lance:
+				if(units[defenderId].weapon == axe){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == sword){
+					damage = (damage * 3)/2;
+				}
 				break;
 			case axe:
+				if(units[defenderId].weapon == sword){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == lance){
+					damage = (damage * 3)/2;
+				}
 				break;
 			case armor:
+				if(units[defenderId].weapon == tome){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == staff){
+					damage = (damage * 3)/2;
+				}
 				break;
 			case tome:
+				if(units[defenderId].weapon == staff){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == armor){
+					damage = (damage * 3)/2;
+				}
 				break;
 			case staff:
+				if(units[defenderId].weapon == armor){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == tome){
+					damage = (damage * 3)/2;
+				}
 				break;
 		}
 		if(damage == 0) { damage = 1; } //can't take 0 damage
@@ -415,4 +446,3 @@ const struct State charActionState = {5, &SelectAttackTarget, &UndoState, &Chang
 const struct State checkWin = {6, &EmptyFunc, &EmptyFunc, &EmptyFunc };
 const struct State waitForEnemy = {7, &EmptyFunc, &EmptyFunc, &EmptyFunc };
 const struct State checkLose = {8, &EmptyFunc, &EmptyFunc, &EmptyFunc}; 
-
