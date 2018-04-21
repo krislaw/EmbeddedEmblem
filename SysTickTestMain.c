@@ -30,7 +30,6 @@
 #include "inc/tm4c123gh6pm.h"
 #include "inc/ST7735.h"
 #include "PLL.h"
-#include "SysTick.h"
 
 #include "GameController.h"
 #include "Graphics.h"
@@ -129,6 +128,7 @@ int main(void){
 	ShowStartupScreen();
 	InputInit();	
 	SoundInit();	//SSI DAC, uses Timer0A, Timer1, Timer2
+	GameInit();
 	
 	//LED SETUP
 	SYSCTL_RCGCGPIO_R |= 0x00000020; // activate clock for port F
@@ -136,8 +136,8 @@ int main(void){
   GPIO_PORTF_DIR_R |= 0x0E;     // PF3,PF2,PF1 outputs
   GPIO_PORTF_DEN_R |= 0x0E;     // enable digital I/O on PF3,PF2,PF1  
 
-	//EnableInterrupts();
-	DisableInterrupts(); //we out here testin'
+	EnableInterrupts();
+	//DisableInterrupts(); //we out here testin'
 		
 	ClearButtonPush(); //ignore presses during setup
 	while(GetButtonPush == 0){ }

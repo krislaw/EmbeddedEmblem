@@ -1,4 +1,6 @@
 #include <stdint.h>
+#include "inc/SysTick.h"
+#include "inc/tm4c123gh6pm.h"
 #include "GameController.h"
 #include "Graphics.h"
 #include "Sprites.h"
@@ -153,6 +155,17 @@ void CheckWin(){
 	}
 }
 
+void SysTickInit(){
+	SYSCTL_RCGCGPIO_R |= 0x20;  // activate port F
+  SysTick_Init();             // initialize SysTick timer
+  GPIO_PORTF_DIR_R |= 0x04;   // make PF2 out (built-in blue LED)
+  GPIO_PORTF_AFSEL_R &= ~0x04;// disable alt funct on PF2
+  GPIO_PORTF_DEN_R |= 0x04;   // enable digital I/O on PF2
+                              // configure PF2 as GPIO
+  GPIO_PORTF_PCTL_R = (GPIO_PORTF_PCTL_R&0xFFFFF0FF)+0x00000000;
+  GPIO_PORTF_AMSEL_R = 0;     // disable analog functionality on PF
+}
+
 /* ======= FUNCTIONS FOR MAP & MAP STATES =============*
 * UpdateCursor(dX, dY), UpdateInfoScreen(character id)
 * scanMap: onA, onScroll
@@ -162,17 +175,19 @@ void CheckWin(){
 */
 
 void UpdateCursor(int8_t dX, int8_t dY){
-	PrintTile(mapX, mapY);
-	//check if move tiles are active, reprint if applicable
-	//check character position, reprint if applicatble
+	//change cursor location, NO PRINTING HERE!!!	
+	switch(currentState->StateNum){
+		case 3: //scanMap scroll
+			if(mapX == Xmin && dX < 0){ mapX = Xmin; }
+			else if(mapX == Xmax && dX > 0){ mapX = Xmax; }
+			else{mapX = mapX + dX; }
 	
-	if(mapX == Xmin && dX < 0){ mapX = Xmin; }
-	else if(mapX == Xmax && dX > 0){ mapX = Xmax; }
-	else{mapX = mapX + dX; }
-	
-	if(mapY == Ymin && dY < 0){ mapY = Ymin; }
-	else if(mapY == Ymax && dY > 0){ mapY = Ymax; }
-	else{mapY = mapY + dY; }
+			if(mapY == Ymin && dY < 0){ mapY = Ymin; }
+			else if(mapY == Ymax && dY > 0){ mapY = Ymax; }
+			else{mapY = mapY + dY; }
+			break;
+		default: return;
+	}
 }
 
 void UpdateInfoScreen(uint8_t id){
@@ -202,16 +217,18 @@ void ScanMapA(){
 void ScanMapScroll(){
 	//reprint map square
 	PrintTile(mapOldX, mapOldY);
-	if(unitsOnMap[mapOldX][mapOldY]){
+	//reprint characters
+	if(unitsOnMap[mapOldX][mapOldY] > -1){
 		PrintSprite(unitsOnMap[mapOldX][mapOldY], mapOldX, mapOldY);
 	}
-	if(mapOldY != Ymax & unitsOnMap[mapOldX][mapOldY + 1] > 0){
+	if((mapOldY < 7) && (unitsOnMap[mapOldX][mapOldY + 1] > (-1))){
 		PrintSprite(unitsOnMap[mapOldX][mapOldY + 1], mapOldX, mapOldY + 1);
 	}
+	
 	//print cursor
 	PrintCursor(mapX, mapY);
 	//check & update info window
-	if(unitsOnMap[mapX][mapY] > 0){
+	if(unitsOnMap[mapX][mapY] > -1){
 		UpdateInfoScreen(unitsOnMap[mapX][mapY]);
 	}
 }
@@ -384,7 +401,8 @@ void PrintMapAll(){
 	for(int i = 0; i < numCharacters; i++){
 		PrintSprite(units[i].id, unitXLocations[i], unitYLocations[i]);
 	}
-	UpdateInfoScreen(3);	
+	UpdateInfoScreen(3);
+	PrintCursor(mapX, mapY);
 }
 
 /* =========== END MAP FUNCTIONS =============*/
@@ -400,9 +418,9 @@ void GenerateTeam(void){ //hard coded player and enemy team
 	units[0] = protagonists[0]; units[0].id = 0;
 	units[1] = protagonists[1]; units[1].id = 1;
 	units[2] = protagonists[5]; units[2].id = 2;
-	units[3] = villains[0]; units[3].id = 3; units[3].name = (char*) villainNames[12];
-	units[4] = villains[1]; units[4].id = 4; units[3].name = (char*) villainNames[12];
-	units[5] = villains[5]; units[5].id = 5; units[3].name = (char*) villainNames[12];
+	units[3] = villains[0]; units[3].id = 3; units[3].name = (char*) villainNames[11];
+	units[4] = villains[1]; units[4].id = 4; units[4].name = (char*) villainNames[17];
+	units[5] = villains[5]; units[5].id = 5; units[5].name = (char*) villainNames[19];
 	
 	SetCharacterGraphics(0, (uint16_t *) &slance1, (uint16_t *) &slance2, (uint16_t *) &slance1face);
 	SetCharacterGraphics(1, (uint16_t *) &slance3, (uint16_t *) &slance3, (uint16_t *) &slance3face);
@@ -415,21 +433,21 @@ void GenerateTeam(void){ //hard coded player and enemy team
 }
 
 void GenerateMap(void) { //hard coded map until map select is complete
-	SetMap((const uint16_t *) &EasterMap); //Easter Map
-	tilesOnMap = (const char**) &EasterArray;
+	SetMap((const uint16_t *) &ruinMap);
+	tilesOnMap = (const char**) &valleyArray;
 	
-	for(uint8_t i = 0; i < 7; i++){ //Initialize the Map for you <3
-		for(uint8_t j = 0; j < 7; j++){
+	for(int i = 0; i < 8; i++) {
+		for(int j = 0; j < 8; j++){
 			unitsOnMap[i][j] = -1;
 		}
 	}
 	unitXLocations[0] = Xmin; unitYLocations[0] = Ymax; unitsOnMap[Xmin][Ymax] = 0;
 	unitXLocations[1] = Xmin; unitYLocations[1] = Ymin; unitsOnMap[Xmin][Ymin] = 1;
-	unitXLocations[2] = Xmin; unitYLocations[2] = 4; unitsOnMap[Xmin + 1][4] = 2;
+	unitXLocations[2] = Xmin + 1; unitYLocations[2] = 4; unitsOnMap[Xmin + 1][4] = 2;
 	
 	unitXLocations[3] = Xmax; unitYLocations[3] = Ymax; unitsOnMap[Xmax][Ymax] = 3;
 	unitXLocations[4] = Xmax; unitYLocations[4] = Ymin; unitsOnMap[Xmax][Ymin] = 4;
-	unitXLocations[5] = Xmax; unitYLocations[5] = 3; unitsOnMap[Xmax - 1][3] = 5;
+	unitXLocations[5] = Xmax - 1; unitYLocations[5] = 3; unitsOnMap[Xmax - 1][3] = 5;
 }
 
  // TODO: Team Builder 
@@ -450,6 +468,7 @@ void BuildTeam(void){
 
 
 void GameInit(){
+	SysTick_Init();
 	//cursor initialization
 	mapX = 0;
 	mapY = 7;
@@ -479,10 +498,9 @@ void RunGame(){
 	PrintMapAll();
 	
 	currentState = &scanMap;
-	
 	while(1){
 		// AnimateCharacters();
-		// SysticWait10ms(1000);
+//		 SysTick_Wait10ms(500);
 		
 		// A and B Buttons
 		int buttons = GetButtonPush();
@@ -496,7 +514,7 @@ void RunGame(){
 		//Cursor Update
 		int8_t dX = GetX();
 		int8_t dY = GetY();
-		if( (dX | dY) > 0) {
+		if( (dX | dY) != 0) {
 			mapOldX = mapX;
 			mapOldY = mapY;
 			UpdateCursor(dX, dY);

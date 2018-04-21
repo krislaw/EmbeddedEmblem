@@ -5,7 +5,7 @@ Controls all buttons and Joystick Logic
 
 #include <stdint.h>
 #include "inc/tm4c123gh6pm.h"
-#include "SysTick.h"
+//#include "SysTick.h"
 #include "Input.h"
 #include "Timer3A.h"
 
@@ -22,18 +22,7 @@ uint8_t AB;
 
 //Joystick on PE 1, 2
 #define js 0x06
-#define jsPeriod 100000
-
-void SysTickInit(){
-	SYSCTL_RCGCGPIO_R |= 0x20;  // activate port F
-  SysTick_Init();             // initialize SysTick timer
-  GPIO_PORTF_DIR_R |= 0x04;   // make PF2 out (built-in blue LED)
-  GPIO_PORTF_AFSEL_R &= ~0x04;// disable alt funct on PF2
-  GPIO_PORTF_DEN_R |= 0x04;   // enable digital I/O on PF2
-                              // configure PF2 as GPIO
-  GPIO_PORTF_PCTL_R = (GPIO_PORTF_PCTL_R&0xFFFFF0FF)+0x00000000;
-  GPIO_PORTF_AMSEL_R = 0;     // disable analog functionality on PF
-}
+#define jsPeriod 7000000
 
 void ButtonInit(){ //AB: PF3, PF4
 		/* Initialize button PF 3 and 4 */	
@@ -51,8 +40,8 @@ void ButtonInit(){ //AB: PF3, PF4
   GPIO_PORTF_IM_R |= (Abut | Bbut);      // (f) arm interrupt on Port F
 
 	NVIC_PRI7_R= (NVIC_PRI7_R& ~0xE0000)|0x00600000; // Port F, bits 23-21 current at priority 3
-  NVIC_EN0_R = 0x40000000; // enable interrupt 4 in NVIC
-		
+  //NVIC_EN0_R = 0x40000000; // enable interrupt 4 in NVIC
+		//TODO: buttons disabled because they stop everything else from running even tho its not on????
 	AB = 0;
 }
 
@@ -160,9 +149,11 @@ uint32_t JSgetY(void){
 int8_t GetX(void){
 	//Tested Values: Right is 0, Left is 4095
 	if(Xraw > highThreshold && XrawOld > highThreshold){
+		Xraw = 2000;
 		return -1; //left
 	}
 	if(Xraw < lowThreshold && XrawOld < lowThreshold){
+		Xraw = 2000;
 		return 1; //right
 	}
 	return 0;
@@ -171,10 +162,12 @@ int8_t GetX(void){
 int8_t GetY(void){ //1 or -1
 	//Tested Values: Down is 0, Up is 4095
 	if(Yraw > highThreshold && YrawOld > highThreshold){
-		return 1; //up
+		Yraw = 2000;
+		return -1; //up
 	}
 	if(Yraw < lowThreshold && YrawOld < lowThreshold){
-		return -1; //down
+		Yraw = 2000;
+		return 1; //down
 	}
 	return 0;
 }
