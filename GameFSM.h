@@ -11,9 +11,9 @@ struct State{
 	
 }State;
 
-#define sword 1
-#define lance 2
-#define axe 3
+#define sword 0
+#define lance 1
+#define axe 2
 
 #define tome 4
 #define staff 5

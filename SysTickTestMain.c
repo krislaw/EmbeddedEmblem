@@ -36,7 +36,6 @@
 #include "Graphics.h"
 #include "Sound.h"
 #include "Input.h"
-#include "Maps.h"
 
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts

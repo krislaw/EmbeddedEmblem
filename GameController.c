@@ -75,30 +75,13 @@ const struct State checkWin;
 const struct State waitForEnemy;
 const struct State checkLose;
 
+/* ======= GENERAL STATE MACHINE FUNCTIONS =============*
+* Undo State is to go back when a B button is pressed, not always applicable
+* Next State goes to the next state, should check that next state is valid BEFORE calling
+*/
 
 void EmptyFunc(){
 	return;
-}
-
-void UpdateCursor(int8_t dX, int8_t dY){
-	PrintTile(mapX, mapY);
-	//check if move tiles are active, reprint if applicable
-	//check character position, reprint if applicatble
-	
-	if(mapX == Xmin && dX < 0){ mapX = Xmin; }
-	else if(mapX == Xmax && dX > 0){ mapX = Xmax; }
-	else{mapX = mapX + dX; }
-	
-	if(mapY == Ymin && dY < 0){ mapY = Ymin; }
-	else if(mapY == Ymax && dY > 0){ mapY = Ymax; }
-	else{mapY = mapY + dY; }
-	
-}
-
-void UpdateInfoScreen(uint8_t id){
-		ShowInfo(units[id].name, id, units[id].lvl,
-			units[id].HP, units[id].MHP, units[id].ATK, units[id].DEF,
-			units[id].RES, units[id].SPD);
 }
 
 void UndoState(){
@@ -133,18 +116,29 @@ void NextState(){
 	}
 }
 
-void ScanMapA(){
-	//select a char
-	if((unitsOnMap[mapX][mapY] > -1) && (unitsOnMap[mapX][mapY] < 3)){
-		selectedUnit = &units[unitsOnMap[mapX][mapY]];
-		selectedX = mapX;
-		selectedY = mapY;
-	}
-	//generate move grid
-	//TODO
+/* ======= FUNCTIONS FOR MAP & MAP STATES =============*
+* UpdateCursor(dX, dY), UpdateInfoScreen(character id)
+* scanMap: onA
+*/
+
+void UpdateCursor(int8_t dX, int8_t dY){
+	PrintTile(mapX, mapY);
+	//check if move tiles are active, reprint if applicable
+	//check character position, reprint if applicatble
 	
-	//go to next state
-	NextState();
+	if(mapX == Xmin && dX < 0){ mapX = Xmin; }
+	else if(mapX == Xmax && dX > 0){ mapX = Xmax; }
+	else{mapX = mapX + dX; }
+	
+	if(mapY == Ymin && dY < 0){ mapY = Ymin; }
+	else if(mapY == Ymax && dY > 0){ mapY = Ymax; }
+	else{mapY = mapY + dY; }
+}
+
+void UpdateInfoScreen(uint8_t id){
+		ShowInfo(units[id].name, id, units[id].lvl,
+			units[id].HP, units[id].MHP, units[id].ATK, units[id].DEF,
+			units[id].RES, units[id].SPD);
 }
 
 /* checkLose state - finished, TEST */
@@ -169,6 +163,23 @@ void CheckWin(){
 	}
 }
 
+void ScanMapA(){
+	//select a char
+	if((unitsOnMap[mapX][mapY] > -1) && (unitsOnMap[mapX][mapY] < 3)){
+		selectedUnit = &units[unitsOnMap[mapX][mapY]];
+		selectedX = mapX;
+		selectedY = mapY;
+	}
+	else{ //not a valid character
+		return; 
+	}
+	//generate move grid
+	//TODO
+	
+	//go to next state
+	NextState();
+}
+
 /* scanMap state onScroll - finished, TEST */
 void ScanMapScroll(){
 	//reprint map square
@@ -189,19 +200,62 @@ void ScanMapScroll(){
 
 void CheckValidAction(){
 	//check if move is valid
+	
 	//go to action state
+	NextState();
 }
 
 void TentativeMove(){
-	//reprint move grid
-	//print cursor
+	//don't let cursor move outside of move grid
+	
+	//reprint move grid from character's original location
+	
+	//reprint cursor
+}
+
+void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
+		//calculate the damage done
+		uint16_t damage = units[attackerId].ATK;
+		switch(units[attackerId].weapon){
+			case tome:
+				damage-= units[defenderId].RES;
+				break;
+			case staff:
+				damage-= units[defenderId].RES;
+			break;
+			default: damage-= units[defenderId].DEF;
+		}
+		//weapon triangle 
+// 1) sword > axe > lance > sword
+// 2) tome > armor > staff > tome
+		switch(units[attackerId].weapon){
+			case sword:
+				if(units[defenderId].weapon == lance){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == axe){
+					damage = (damage * 3)/2;
+				}
+				break;
+			case lance:
+				break;
+			case axe:
+				break;
+			case armor:
+				break;
+			case tome:
+				break;
+			case staff:
+				break;
+		}
+		if(damage == 0) { damage = 1; } //can't take 0 damage
+		
+		
+		
 }
 
 void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
-	//calculate the difference in stats
-	
-	//if defender = pc, checkLose
-	//if defencer = npc, checkWin
+		//commit changes from calculated combat
 }
 
 void ChangeAttackTarget(){
@@ -215,6 +269,7 @@ void SelectAttackTarget(){
 	uint16_t attackerId;
 	uint16_t defenderId;
 	
+	CalculateCombat(attackerId, defenderId);
 	ResolveCombat(attackerId, defenderId);
 	//do combat animations??
 }
@@ -303,7 +358,6 @@ void RunGame(){
 	
 	//SelectMap();
 	GenerateMap();
-	
 	
 	currentState = &scanMap;
 	
