@@ -1,1 +1,0 @@
-const unsigned short 128BeachMap[] = {
