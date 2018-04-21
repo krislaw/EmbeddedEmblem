@@ -75,7 +75,7 @@ bin
 *.sch
 *.pcb
 *.uvproj
-
+*.fab
 
 #other project resources
 *.xls
