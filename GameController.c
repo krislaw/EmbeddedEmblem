@@ -49,6 +49,10 @@ uint16_t selectedX;
 uint16_t selectedY;
 uint16_t attackTargetId;
 
+//State: charAction
+uint8_t targetsGenerated = 0; //used to avoid redundant calls to generateTargets
+uint16_t targetIdx = 0; //idx of target disp
+
 //allowable locations for characters/cursors
 #define Xmin 0
 #define Ymin 1
@@ -89,6 +93,10 @@ void UndoState(){
 	switch(currentState->StateNum){
 		case 1: currentState = &previewStats; break;
 		case 4: currentState = &scanMap; break;
+		case 5: 
+			currentState = &charSelected;
+			targetsGenerated = 0;
+			break;
 		default:
 			break; //cannot go back
 	}
@@ -213,7 +221,7 @@ void TentativeMove(){
 	//reprint cursor
 }
 
-void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
+uint16_t CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 		//calculate the damage done
 		uint16_t damage = units[attackerId].ATK;
 		switch(units[attackerId].weapon){
@@ -238,29 +246,89 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 				}
 				break;
 			case lance:
+				if(units[defenderId].weapon == axe){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == sword){
+					damage = (damage * 3)/2;
+				}
 				break;
 			case axe:
+				if(units[defenderId].weapon == sword){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == lance){
+					damage = (damage * 3)/2;
+				}
 				break;
 			case armor:
+				if(units[defenderId].weapon == tome){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == staff){
+					damage = (damage * 3)/2;
+				}
 				break;
 			case tome:
+				if(units[defenderId].weapon == staff){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == armor){
+					damage = (damage * 3)/2;
+				}
 				break;
 			case staff:
+				if(units[defenderId].weapon == armor){
+					damage = (damage * 3)/4;
+				}
+				if(units[defenderId].weapon == tome){
+					damage = (damage * 3)/2;
+				}
 				break;
 		}
 		if(damage == 0) { damage = 1; } //can't take 0 damage
 		
 		
-		
+		return damage;
 }
 
-void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
+void ResolveCombat(uint16_t attackerId, uint16_t defenderId, uint16_t damage){
 		//commit changes from calculated combat
+		units[defenderId].HP-=damage;
+	
 }
 
 void ChangeAttackTarget(){
 	//generate a list of attackable enemies
-	//cycle through them + option not to attack
+	if(!targetsGenerated){
+		getValidTargets(selectedX, selectedY, unitsOnMap);
+		targetIdx = 0;
+	}else{
+		if(validTargets[0][targetIdx] == 0xFF){
+			//found end sentinel
+			targetIdx = 0;
+		}else{
+			targetIdx = (targetIdx+1)%8;
+		}
+	}
+	
+	//find target based on coord
+	
+	uint16_t xCoor, yCoor;
+	if(validTargets[0][targetIdx] == 0xFF){
+		xCoor = selectedX;
+		yCoor = selectedY;
+		//TODO: attackTargetId?
+		attackTargetId = 0xFFFF;
+	}else{
+		xCoor = validTargets[0][targetIdx];
+		yCoor = validTargets[1][targetIdx];
+		attackTargetId = unitsOnMap[xCoor][yCoor];
+	}
+	
+	PrintCursor(xCoor, yCoor);
+	
+	
 	//reprint cursor/info screen
 }
 
@@ -269,8 +337,7 @@ void SelectAttackTarget(){
 	uint16_t attackerId;
 	uint16_t defenderId;
 	
-	CalculateCombat(attackerId, defenderId);
-	ResolveCombat(attackerId, defenderId);
+	ResolveCombat(attackerId, defenderId,CalculateCombat(attackerId, defenderId));
 	//do combat animations??
 }
 

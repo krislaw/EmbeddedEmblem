@@ -4,7 +4,7 @@
 uint8_t validMoves[2][25];
 uint8_t validTargets[2][8];
 
-void getValidMoves(uint8_t x, uint8_t y, uint16_t mapGrid[7][7], uint16_t charGrid[7][7], uint8_t moveAmt){
+void getValidMoves(uint8_t x, uint8_t y, int16_t mapGrid[8][8], int16_t charGrid[8][8], uint8_t moveAmt){
 	uint8_t xCoor, yCoor;
 	int moveIdx = 0;
 	int i;
@@ -32,9 +32,9 @@ void getValidMoves(uint8_t x, uint8_t y, uint16_t mapGrid[7][7], uint16_t charGr
 	}
 }
 
-void getValidTargets(uint8_t x, uint8_t y, uint16_t charGrid[7][7]){
-	int i, j;
-	int targetIdx = 0;
+void getValidTargets(uint8_t x, uint8_t y, int16_t charGrid[8][8]){
+	int16_t i, j;
+	int16_t targetIdx = 0;
 	for( i = x -1; i< x+1; i ++){
 		if(targetIdx ==8) break;
 		for(j = y-1; j < y+1; j++){
