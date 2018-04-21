@@ -27,8 +27,8 @@
  */
 
 #include <stdint.h>
-#include "inc//tm4c123gh6pm.h"
-#include "inc//ST7735.h"
+#include "inc/tm4c123gh6pm.h"
+#include "inc/ST7735.h"
 #include "PLL.h"
 #include "SysTick.h"
 
@@ -36,13 +36,13 @@
 #include "Graphics.h"
 #include "Sound.h"
 #include "Input.h"
-//#include "HardCoded.h"
+#include "Maps.h"
 
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
 
 /* ==== HARDWARE TESTER FUNCTIONS
-*
+* Tests for Music, Graphics, and Analog Inputs
 *
 *
 */
@@ -55,8 +55,8 @@ void SoundTest(){
 
 void GraphicsTest(){
 	/* Print the Map as 8 x 8 of Tiles */
-	SetMap(0);
-	
+	//SetMap((const uint16_t *) &EasterMap);
+	/*
 	for(int y = 0; y < 8; y ++){
 		for(int x = 0; x < 8; x++){
 			PrintTile(x, y);
@@ -65,26 +65,19 @@ void GraphicsTest(){
 	
 	PrintSprite(0, 0, 0);
 	PrintSprite(0, 7, 7);
+	*/
 }
 
 
 void ButtonTest(){
 	uint8_t vector = GetButtonPush();
-	ST7735_SetCursor(1,4);
-	if((vector & 0x1) == 0){
-		ST7735_OutChar('_');
-	}
-	else{
-		ST7735_OutChar('A');
+	if((vector & 0x1) > 0){
+		GPIO_PORTF_DATA_R = GPIO_PORTF_DATA_R^0x02;
 	}
 	
-	if((vector & 0x2) == 0){
-		ST7735_OutChar('_');
+	if((vector & 0x2) > 0){
+		GPIO_PORTF_DATA_R = GPIO_PORTF_DATA_R^0x01;
 	}
-	else{
-		ST7735_OutChar('B');
-	}
-	
 }
 
 void JSTest(){
@@ -103,36 +96,8 @@ void JSTest(){
 		}
 }
 
-	/* === MAIN INITIALIZATIONS ====
-	*
-	*
-	*/
-	
-int main(void){
-	PLL_Init(Bus80MHz);         // set system clock to 80 MHz
-	DisableInterrupts();
-	InputInit();	
-	GraphicsInit(); //ST7735 and resources, will use Timer 4
-	ShowStartupScreen();
-	SoundInit();	//SSI DAC, uses Timer0A, Timer1, Timer2
-	
-	//LED SETUP
-	SYSCTL_RCGCGPIO_R |= 0x00000020; // activate clock for port F
-  while((SYSCTL_PRGPIO_R & 0x00000020) == 0){};
-  GPIO_PORTF_DIR_R |= 0x0E;     // PF3,PF2,PF1 outputs
-  GPIO_PORTF_DEN_R |= 0x0E;     // enable digital I/O on PF3,PF2,PF1  
-		
-	EnableInterrupts();
-	
-	RunGame();
-	
-		/* Tests */
-	
-	/* === MAIN WHILE LOOP ====
-	*
-	*
-	*/
-  while(1){
+void RunTests(){
+	  while(1){
     GPIO_PORTF_DATA_R = GPIO_PORTF_DATA_R^0x04; // toggle PF2		
 		SoundTest();
 //		SysTick_Wait10ms(100);
@@ -152,4 +117,36 @@ int main(void){
 		}
 		*/
   }
+}
+	/* === MAIN INITIALIZATIONS ====
+	*
+	*
+	*/
+	
+int main(void){
+	PLL_Init(Bus80MHz);         // set system clock to 80 MHz
+	DisableInterrupts();
+	GraphicsInit(); //ST7735 and resources, will use Timer 4
+	ShowStartupScreen();
+	InputInit();	
+	SoundInit();	//SSI DAC, uses Timer0A, Timer1, Timer2
+	
+	//LED SETUP
+	SYSCTL_RCGCGPIO_R |= 0x00000020; // activate clock for port F
+  while((SYSCTL_PRGPIO_R & 0x00000020) == 0){};
+  GPIO_PORTF_DIR_R |= 0x0E;     // PF3,PF2,PF1 outputs
+  GPIO_PORTF_DEN_R |= 0x0E;     // enable digital I/O on PF3,PF2,PF1  
+		
+	EnableInterrupts();
+	
+	ClearButtonPush(); //ignore presses during setup
+	while(GetButtonPush == 0){ }
+	
+		/* === MAIN CODE FOR TESTING OR RUNNING ====
+	* Run Tests will run the above tests on the hardware
+	* Run Game will start the actual project
+	*/
+	
+	//RunTests(); //check hardware functionality.
+	RunGame();
 }

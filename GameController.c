@@ -3,6 +3,7 @@
 #include "Graphics.h"
 #include "Sprites.h"
 #include "Portraits.h"
+#include "Maps.h"
 #include "Sound.h"
 #include "GameFSM.h"
 #include "Input.h"
@@ -28,8 +29,9 @@ uint16_t buildTeamY;
 * Global Values used during fights each time a map is loaded up.
 */
 uint8_t unitXLocations[8]; 	//index is character id number
-uint8_t uintYLocations[8]; 	//index is character id number
+uint8_t unitYLocations[8]; 	//index is character id number
 int16_t unitsOnMap[8][8]; 	//-1 indicates empty, else id number of character in that space
+const char** tilesOnMap;		//8x8 array describing the terrain
 uint8_t numCharacters; 			//number of characters on the current map, max 8
 uint8_t alive; 							//npc + pc vector
 uint8_t moved; 							//npc + pc vector
@@ -240,6 +242,24 @@ void GenerateTeam(void){ //hard coded team until team builder is completed
 	setCharacterGraphics(5, (uint16_t *) &marmor1, (uint16_t *) &marmor1, (uint16_t *) &marmor1face);
 }
 
+void GenerateMap(void) { //hard coded map until map select is complete
+	SetMap((const uint16_t *) &EasterMap); //Easter Map
+	tilesOnMap = (const char**) &EasterArray;
+	
+	for(uint8_t i = 0; i < 7; i++){ //Initialize the Map for you <3
+		for(uint8_t j = 0; j < 7; j++){
+			unitsOnMap[i][j] = -1;
+		}
+	}
+	unitXLocations[0] = 0; unitYLocations[0] = 7; unitsOnMap[0][7] = 0;
+	unitXLocations[1] = 1; unitYLocations[1] = 7; unitsOnMap[1][7] = 1;
+	unitXLocations[2] = 0; unitYLocations[2] = 6; unitsOnMap[0][6] = 2;
+	
+	unitXLocations[3] = 6; unitYLocations[3] = 0; unitsOnMap[6][0] = 3;
+	unitXLocations[4] = 7; unitYLocations[4] = 0; unitsOnMap[7][0] = 4;
+	unitXLocations[5] = 7; unitYLocations[5] = 1; unitsOnMap[7][1] = 5;
+}
+
  // TODO: Team Builder 
 void TeambuildScroll(void){
 	//
@@ -281,13 +301,17 @@ void RunGame(){
 	//BuildTeam();
 	GenerateTeam();
 	
+	//SelectMap();
+	GenerateMap();
+	
+	
 	currentState = &scanMap;
 	
 	while(1){
 		// AnimateCharacters();
 		// SysticWait10ms(1000);
 		
-		// AB Buttons
+		// A and B Buttons
 		int buttons = GetButtonPush();
 		if((buttons & 0x2) > 0) {
 			(*currentState->onB)();
@@ -309,6 +333,7 @@ void RunGame(){
 		
 		switch(currentState->StateNum){
 		//special things for special states
+			default: break;
 		}
 		
 	}
@@ -326,7 +351,7 @@ const struct State selectTeam = {0, &NextState, &EmptyFunc, &TeambuildScroll };
 const struct State previewStats = {1, &NextState, &UndoState, &EmptyFunc };
 const struct State addToTeam = {2, &NextState, &EmptyFunc, &EmptyFunc };
 
-const struct State viewTutorial; //push B from the scan 
+const struct State viewTutorial; //push B from the chooseMap screen
 const struct State chooseMap;
 const struct State initializeMap;
 

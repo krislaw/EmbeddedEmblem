@@ -5,19 +5,16 @@
 //#include "Sprites.h"
 //#include "Portraits.h"
 
-uint16_t * currentMap;
+const uint16_t * currentMap;
 uint16_t ** charSprites;
 uint8_t animate;
 uint16_t * charSpritesA[8];
 uint16_t * charSpritesB[8];
 uint16_t * charPortraits[8];
 
-//uint8_t numCharacters;
-
 void GraphicsInit(){ Output_Init(); }
 
 //input: character id, 2 25x15 sprites and 1 32x32 portrait
-
 void setCharacterGraphics(uint8_t id, uint16_t* sprite1, uint16_t* sprite2, uint16_t* portrait){
 	charSprites[id] = sprite1;
 	charSpritesA[id] = sprite1;
@@ -119,12 +116,8 @@ void PrintMissionCursor(uint8_t ypos){
 	ST7735_OutChar('>');
 }
 
-void SetMap(char mapId){ // what image to load, 128 x 128 pixels
-	switch(mapId){
-		case 1: currentMap = (uint16_t *) &EasterMap;
-		case 2: currentMap = (uint16_t *) &BeachMap;
-		default: currentMap = (uint16_t *) &EasterMap;
-	}
+void SetMap(const uint16_t * map){ // what image to load, 128 x 128 pixels
+	currentMap = map;
 }
 
 void ShowMap(void){

@@ -4,7 +4,7 @@ Controls all buttons and Joystick Logic
 */
 
 #include <stdint.h>
-#include "../inc/tm4c123gh6pm.h"
+#include "inc/tm4c123gh6pm.h"
 #include "SysTick.h"
 #include "Input.h"
 #include "Timer3A.h"
@@ -69,9 +69,14 @@ void GPIOPortF_Handler(void){
 
 uint8_t GetButtonPush(void){
 	uint8_t ret = AB;
-	AB = 0;
+	AB = 0; //clear vector when button is read
 	return ret;
 }
+
+void ClearButtonPush(void){
+	AB = 0; //clear vector when button is read
+}
+
 
 //------------ADC_In23------------
 // Busy-wait Analog to digital conversion
@@ -100,69 +105,43 @@ void ADC_In23(){
 }
 
 
-void JSInit(){ //ADC
+void JSInit(){ //ADC for the Joystick
 	Timer3A_Init(&ADC_In23, jsPeriod); // how often the adc gets read i guess
 	
-	 volatile unsigned long delay;
-	SYSCTL_RCGCADC_R |= 0x00000001; // 1) activate ADC0
+	volatile unsigned long delay;
+	SYSCTL_RCGCADC_R |= 0x00000003; // 1) activate ADC0 and ADC1
   SYSCTL_RCGCGPIO_R |= 0x10; // 1) activate clock for Port E
 	
   delay = SYSCTL_RCGC2_R;         //    allow time for clock to stabilize
-	while((SYSCTL_RCGCADC_R & 0x1) == 0){}
+	while((SYSCTL_RCGCADC_R & 0x3) == 0){}
 		
-  GPIO_PORTE_DIR_R &= ~js;      // 2) make PE4 input
-  GPIO_PORTE_AFSEL_R |= js;     // 3) enable alternate function on PE2
-  GPIO_PORTE_DEN_R &= ~js;      // 4) disable digital I/O on PE2
+  GPIO_PORTE_DIR_R &= ~js;      // 2) make PE1, PE2 input
+  GPIO_PORTE_AFSEL_R |= js;     // 3) enable alternate function on PE1, PE2
+  GPIO_PORTE_DEN_R &= ~js;      // 4) disable digital I/O on PE1, PE2
 	
 	GPIO_PORTE_PCTL_R = GPIO_PORTE_PCTL_R&0xFFFFF00F;
-  GPIO_PORTE_AMSEL_R |= js;     // 5) enable analog function on PE2
-  ADC0_PC_R &= ~0xF;              // 8) clear max sample rate field //HELP: crashing on line
+  GPIO_PORTE_AMSEL_R |= js;       // 5) enable analog function on PE2
+  ADC0_PC_R &= ~0xF;              // 8) clear max sample rate field
   ADC0_PC_R |= 0x1;               //    configure for 125K samples/sec
-  ADC0_SSPRI_R = 0x3210;          // 9) Sequencer 3 is lowest priority
+  ADC0_SSPRI_R = 0x0123;          // 9) Sequencer 3 is lowest priority
   ADC0_ACTSS_R &= ~0x0004;        // 10) disable sample sequencer 2
   ADC0_EMUX_R &= ~0x0F00;         // 11) seq2 is software trigger
-  ADC0_SSMUX2_R = 0x0023;         // 12) set channels for SS2 // 2 and 3 is differential pair 1
+  ADC0_SSMUX2_R = 0x0012;         // 12) set channels for SS2 // 2 and 3 is differential pair 1
   ADC0_SSCTL2_R = 0x0060;         // 13) no TS0 D0 IE0 END0 TS1 D1, yes IE1 END1
   ADC0_IM_R &= ~0x0004;           // 14) disable SS2 interrupts
 	ADC0_ACTSS_R |= 0x0004;         // 15) enable sample sequencer 2 !!! TODO: probably using sequencer 1 or 0
-	
-	
-	/* //not working ):
-  volatile unsigned long delay;
-	
-  SYSCTL_RCGC2_R |= 0x00000010;   // 1) activate clock for Port E
-  delay = SYSCTL_RCGC2_R;         //    allow time for clock to stabilize
-	
-	SYSCTL_RCGC0_R |= 0x00000001;   // 6) activate ADC0 ???
-  delay = SYSCTL_RCGC2_R; 
-	
-  GPIO_PORTE_DIR_R &= ~js;      // 2) make PE4 input
-  GPIO_PORTE_AFSEL_R |= js;     // 3) enable alternate function on PE2
-  GPIO_PORTE_DEN_R &= ~js;      // 4) disable digital I/O on PE2
-  GPIO_PORTE_AMSEL_R |= js;     // 5) enable analog function on PE2
-	
-	//SYSCTL_RCGCADC_R |= 0x00000001; // 6) activate ADC0 ???
- 
-	GPIO_PORTE_PCTL_R = GPIO_PORTE_PCTL_R&0xFFFFF00F;
-	
-  SYSCTL_RCGC0_R &= ~0x00000300;  // 7) configure for 125K
-	
-
-	*/
 }
 
 
 /* ====== INPUT INIT =======
-* Initialize buttons in stuff
-* 
+* Initialize buttons and joystick
+* Buttons use 
 */
 void InputInit(){
-	SysTickInit(); //use for debouncing?
 	ButtonInit();
 	//ControlPadInit();
-	JSInit(); // 4/2/2018: Hardfaults everywhere, pls fix
+	JSInit(); //Uses Timer3, PE1, PE2
 }
-
 
 
 uint32_t JSgetX(void){
@@ -178,22 +157,24 @@ uint32_t JSgetY(void){
  #define highThreshold 3000
  #define lowThreshold 1000
 
-int8_t GetX(void){ //1 or -1
+int8_t GetX(void){
+	//Tested Values: Right is 0, Left is 4095
 	if(Xraw > highThreshold && XrawOld > highThreshold){
-		return 1;
+		return -1; //left
 	}
 	if(Xraw < lowThreshold && XrawOld < lowThreshold){
-		return -1;
+		return 1; //right
 	}
 	return 0;
 }
 
 int8_t GetY(void){ //1 or -1
+	//Tested Values: Down is 0, Up is 4095
 	if(Yraw > highThreshold && YrawOld > highThreshold){
-		return 1;
+		return 1; //up
 	}
 	if(Yraw < lowThreshold && YrawOld < lowThreshold){
-		return -1;
+		return -1; //down
 	}
 	return 0;
 }

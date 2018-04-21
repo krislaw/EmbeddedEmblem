@@ -1,5 +1,5 @@
 #include "DAC.h"
-#include "../inc/tm4c123gh6pm.h"
+#include "inc/tm4c123gh6pm.h"
 /*SSI3 B4, 5, 6, 7*/
 #include <stdint.h>
 

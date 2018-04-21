@@ -5,7 +5,8 @@
 
 void InputInit(void);
 
-uint8_t GetButtonPush(void); // 0x00BA
+uint8_t GetButtonPush(void);
+void ClearButtonPush(void);
 
 uint32_t JSgetX(void);
 uint32_t JSgetY(void);

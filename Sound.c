@@ -12,7 +12,7 @@
 #include "Timer2A.h"
 #include "DAC.h"
 
-#include "../inc/ST7735.h"
+#include "inc/ST7735.h"
 
 #define wavesize 64 
 uint16_t waveIndex;

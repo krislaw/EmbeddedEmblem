@@ -14,7 +14,7 @@
 
 void GraphicsInit(void);
 
-void SetMap(char mapId); // what image to load, character sprites, map size if we implement scrolling, ect.
+void SetMap(const uint16_t* map); // what image to load, character sprites, map size if we implement scrolling, ect.
 void ShowMap(void);
 void PrintTile(int tilex, int tiley);
 void PrintCursor(uint16_t x, uint16_t y);
