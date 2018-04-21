@@ -50,11 +50,20 @@ const struct Unit protagonists[6] = { //TODO: add tome, armor options
 };
 
 const struct Unit villains[6] = { //TODO: add lance options
-	{3, 1, "Name", armor, 25, 25, 14, 16, 4, 6, 1},			//marmor1
-	{3, 1, "Name", axe, 13, 13, 21, 10, 10, 10, 2},			//maxe3
-	{3, 1, "Name", staff, 16, 16, 12, 6, 12, 8, 2},			//mcleric1
-	{3, 1, "Name", tome, 13, 13, 16, 10, 11, 10, 2},				//mmage1
-	{3, 1, "Name", sword, 17, 17, 18, 6, 6, 15, 2},			//mthief1
-	{3, 1, "Name", sword, 15, 15, 18, 6, 6, 6, 2}				//mASSasin1 i forgot an s okay sue me
+	{3, 1, "", armor, 25, 25, 14, 16, 4, 6, 1},			//marmor1
+	{3, 1, "", axe, 13, 13, 21, 10, 10, 10, 2},			//maxe3
+	{3, 1, "", staff, 16, 16, 12, 6, 12, 8, 2},			//mcleric1
+	{3, 1, "", tome, 13, 13, 16, 10, 11, 10, 2},			//mmage1
+	{3, 1, "", sword, 17, 17, 18, 6, 6, 15, 2},			//mthief1
+	{3, 1, "", sword, 15, 15, 18, 6, 6, 6, 2}				//mASSasin1 i forgot an s okay sue me
+};
+
+const char villainNames[30][6] = { //randomly generate villain names, shoutout to SEC Eweek 2018 for theme
+	"Zeus", "Hera", "Poise", "Demtr", "Ares",
+	"Athen", "Armis", "Heph", "Dite", "Ermes",
+	"Dions", "Hades", "Hypno", "Nike", "Janus",
+	"Nemis", "Iris", "Hecat", "Tyche", "Percy",
+	"Calip", "Clio", "Eutre", "Erato", "Mepho",
+	"Hymn", "Techo", "Thali", "Urnia", "Dia"
 };
 

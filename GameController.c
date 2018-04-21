@@ -251,7 +251,6 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 		if(damage == 0) { damage = 1; } //can't take 0 damage
 		
 		
-		
 }
 
 void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
@@ -259,9 +258,12 @@ void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
 }
 
 void ChangeAttackTarget(){
-	//generate a list of attackable enemies
-	//cycle through them + option not to attack
+	//generate a list of attackable enemies TODO: move this to run once when you enter charActionState
+	//cycle through list of attackable characters + option not to attack
+	uint16_t attackerId;
+	uint16_t defenderId;
 	//reprint cursor/info screen
+	CalculateCombat(attackerId, defenderId);
 }
 
 void SelectAttackTarget(){
@@ -269,13 +271,16 @@ void SelectAttackTarget(){
 	uint16_t attackerId;
 	uint16_t defenderId;
 	
-	CalculateCombat(attackerId, defenderId);
 	ResolveCombat(attackerId, defenderId);
+	
 	//do combat animations??
 }
 
 //TODO: need to make DEEP COPIES of the starting units so that HP can be updated
 
+void DeepCopyUnitFromSource(uint16_t idNumber, uint16_t source){
+	
+}
 void GenerateTeam(void){ //hard coded team until team builder is completed
 	units[0] = protagonists[0];
 	units[1] = protagonists[1];
