@@ -274,24 +274,19 @@ void SelectAttackTarget(){
 	//do combat animations??
 }
 
-struct Unit npcKris = {0, 2, "Kris", sword, 15, 15, 18, 6, 6, 6, 2};
-struct Unit npcSteph = {1, 2, "Steph", sword, 15, 15, 18, 6, 6, 6, 2};
-struct Unit npcBrandon = {2, 2, "Brndn", lance, 15, 15, 18, 6, 6, 6, 2};
-struct Unit npc1 = {3, 1, "Res", tome, 12, 12, 15, 6, 6, 6, 2};
-struct Unit npc2 = {4, 1, "Cap", sword, 12, 12, 15, 6, 6, 6, 2};
-struct Unit npc3 = {5, 1, "Indu", armor, 12, 12, 15, 6, 6, 6, 2};
+//TODO: need to make DEEP COPIES of the starting units so that HP can be updated
 
 void GenerateTeam(void){ //hard coded team until team builder is completed
-	units[0] = npcKris;
-	units[1] = npcSteph;
-	units[2] = npcBrandon;
-	units[3] = npc1;
-	units[4] = npc2;
-	units[5] = npc3;
+	units[0] = protagonists[0];
+	units[1] = protagonists[1];
+	units[2] = protagonists[5];
+	units[3] = villains[0];
+	units[4] = villains[1];
+	units[5] = villains[5];
 	
-	setCharacterGraphics(0, (uint16_t *) &ssword1, (uint16_t *) &ssword1, (uint16_t *) &ssword1face);
-	setCharacterGraphics(1, (uint16_t *) &ssword3, (uint16_t *) &ssword3, (uint16_t *) &ssword3face);
-	setCharacterGraphics(2, (uint16_t *) &slance3, (uint16_t *) &slance3, (uint16_t *) &slance3face);
+	setCharacterGraphics(0, (uint16_t *) &slance1, (uint16_t *) &slance2, (uint16_t *) &slance1face);
+	setCharacterGraphics(1, (uint16_t *) &slance3, (uint16_t *) &slance3, (uint16_t *) &slance3face);
+	setCharacterGraphics(2, (uint16_t *) &ssword3, (uint16_t *) &ssword3, (uint16_t *) &ssword3face);
 	setCharacterGraphics(3, (uint16_t *) &mmage1, (uint16_t *) &mmage1, (uint16_t *) &mmage1face);
 	setCharacterGraphics(4, (uint16_t *) &massassin1, (uint16_t *) &massassin1, (uint16_t *) &massasin1face);
 	setCharacterGraphics(5, (uint16_t *) &marmor1, (uint16_t *) &marmor1, (uint16_t *) &marmor1face);
