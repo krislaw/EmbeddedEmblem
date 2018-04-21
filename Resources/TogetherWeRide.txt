@@ -1,0 +1,240 @@
+// Song - Together We Ride, Fire Emblem
+// Tracks - 4 total, 2 treble, 2 bass
+// Reminder that if short for memory, only use the "main" arrays from treble and bass
+//Arranged by Maxwell Archibald
+
+uint32_t songBattleTrebleMainNotes[152] = {
+		A5, 0, A5, 0, A5, 0, A5,		// Intro Sequence 1
+		A#5, 0, A#5, 0, A#5, 0, A#5,
+		C6, 0, C6, 0, C6, 0, C6,
+		A#5, 0, A#5, 0, A#5, 0, A#5,
+		A5, 0, A5, 0, A5, 0, A5,
+		A5, 0, A5, 0, A5, 0, A5,
+		
+		A5, 0, A5, 0, A5, 0, A5,		// Intro Sequence 2
+		A#5, 0, A#5, 0, A#5, 0, A#5,
+		C6, 0, C6, 0, C6, 0, C6,
+		A#5, 0, A#5, 0, A#5, 0, A#5,
+		A5, 0, A5, 0, A5, 0, A5,
+		A5, 0, E6, 0, E6, 0,
+		
+		E6, D6, E6, F6, 0,				// Theme Sequence 1
+		E6, D6, E6, F6, 0,
+		E6, D6, E6, F6, 0,
+		G6, A6, G6, F6, E6, D6, C#6, E6,
+		
+		E6, D6, E6, A6, 0,				// Theme Sequence 2
+		E6, D6, E6, A6, 0,
+		E6, D6, E6, A6, 0,
+		A6, A#6, A6, G6, A6, G6, F6, E6,
+		
+		F6, E6, D6, A5, 0,				// Theme Sequence 3
+		F6, E6, D6, A5, 0,
+		F6, E6, D6, C#6, 0, E6, 0,
+		E6, 0, D6, 0, A6, 0
+};
+
+uint32_t songBattleTrebleMainDur[152] = {
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,	// Intro Sequence 1
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,	// Intro Sequence 2
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eitdot, eit/2, eit/2, eit/2, eit/2,
+		
+		eit/2, eit/2, eit/2, eit/2, qtr,				// Theme Sequence 1
+		eit/2, eit/2, eit/2, eit/2, qtr,
+		eit/2, eit/2, eit/2, eit/2, qtr,
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit/2, eit/2, eit/2, eit/2, qtr,				// Theme Sequence 2
+		eit/2, eit/2, eit/2, eit/2, qtr,
+		eit/2, eit/2, eit/2, eit/2, qtr,
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit/2, eit/2, eit/2, eit/2, qtr,				// Theme Sequence 3
+		eit/2, eit/2, eit/2, eit/2, qtr,
+		eit/2, eit/2, eit/2, eit/2, qtr,
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2
+};
+		
+uint32_t songBattleTrebleAuxNotes[139] = {
+		E5, 0, E5, 0, E5, 0, E5,		// Intro Sequence 1
+		F5, 0, F5, 0, F5, 0, F5,
+		G5, 0, G5, 0, G5, 0, G5,
+		F5, 0, F5, 0, F5, 0, F5,
+		E5, 0, E5, 0, E5, 0, E5,
+		E5, 0, E5, 0, E5, 0, E5,
+		
+		E5, 0, E5, 0, E5, 0, E5,		// Intro Sequence 2
+		F5, 0, F5, 0, F5, 0, F5,
+		G5, 0, G5, 0, G5, 0, G5,
+		F5, 0, F5, 0, F5, 0, F5,
+		E5, 0, E5, 0, E5, 0, E5,
+		E5, 0, C#6, 0, C#6, 0,
+		
+		A5, 0, D6, 0,					// Theme Sequence 1
+		A5, 0, D6, 0,
+		A5, 0, D6, 0,
+		E6, 0, D6, 0, A5, 0,
+		
+		A5, 0, D6, 0,					// Theme Sequence 2
+		A5, 0, D6, 0,
+		A5, 0, D6, 0,
+		F6, 0, D6, 0, D6, 0,
+		
+		D6, 0, F5, 0,					// Theme Sequence 3
+		D6, 0, F5, 0,
+		D6, 0, A5, 0, C#6, 0,
+		C#6, 0, A5, 0, F6, 0
+};
+
+uint32_t songBattleTrebleAuxDur[139] = {
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,	// Intro Sequence 1
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,	// Intro Sequence 2
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eit, eit/2, eit/2, eit/2, eit/2, eit/2,
+		eit/2, eitdot, eit/2, eit/2, eit/2, eit/2,
+		
+		eit/2, eit, eit/2, qtr,							// Theme Sequence 1
+		eit/2, eit, eit/2, qtr,
+		eit/2, eit, eit/2, qtr,
+		eit/2, eit, eit/2, eit, eit/2, eit/2,
+		
+		eit/2, eit, eit/2, qtr,							// Theme Sequence 2
+		eit/2, eit, eit/2, qtr,
+		eit/2, eit, eit/2, qtr,
+		eit/2, eit, eit/2, eit, eit/2, eit/2,
+		
+		eit/2, eit, eit/2, qtr,							// Theme Sequence 3
+		eit/2, eit, eit/2, qtr,
+		eit/2, eit, eit/2, eit, eit/2, eit/2,
+		eit/2, eit, eit/2, eit, eit/2, eit/2
+};
+
+uint32_t songBattleBassMainNotes[84] = {
+		A2, E3, A3,						// Intro Sequence 1
+		A#2, F3, A#3,
+		C3, G3, C4,
+		A#2, F3, A#3,
+		A2, E3, A3,
+		A2, E3, A3,
+		
+		A3, E4, A4,						// Intro Sequence 2
+		A#3, F4, A#4,
+		C4, G4, C5,
+		A#3, F4, A#4,
+		A3, E4, A4,
+		A3, 0, 0,
+		
+		D4, A4, A3, A4,					// Theme Sequence 1
+		A#3, F4, F3, F4,
+		C4, G4, G3, G4,
+		A3, E4, E3, E4,
+		
+		A#3, F4, F3, F4,				// Theme Sequence 2
+		C4, G4, G3, G4,
+		A3, E4, E3, E4,
+		D4, A4, A3, A4,
+		
+		A#3, F4, F3, F4,				// Theme Sequence 3
+		C4, G4, G3, G4,
+		A3, E4, E3, E4,
+		D4, A4, A3, A4
+};
+
+uint32_t songBattleBassMainDur[84] {
+		eitdot, eitdot, eit,			// Intro Sequence 1
+		eitdot, eitdot, eit,
+		eitdot, eitdot, eit,
+		eitdot, eitdot, eit,
+		eitdot, eitdot, eit,
+		eitdot, eitdot, eit,
+		
+		eitdot, eitdot, eit,			// Intro Sequence 2
+		eitdot, eitdot, eit,
+		eitdot, eitdot, eit,
+		eitdot, eitdot, eit,
+		eitdot, eitdot, eit,
+		eit/2, eitdot, qtr,
+		
+		eitdot, eit, eit/2, eit,		// Theme Sequence 1
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		
+		eitdot, eit, eit/2, eit,		// Theme Sequence 2
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		
+		eitdot, eit, eit/2, eit,		// Theme Sequence 3
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit
+};
+
+uint32_t songBattleBassAuxNotes[71] = {
+		0, C#4, 0, D4,					// Intro Sequence 1
+		0, E4, 0, D4,
+		0, C#4, 0, C#4,
+		
+		0, C#5, 0, D5,					// Intro Sequence 2
+		0, E5, 0, D5,
+		0, C#5, 0,
+		
+		A3, F4, D3, F4,					// Theme Sequence 1
+		F3, D4, A#2, D4,
+		G3, E4, C3, E4,
+		E3, C#4, A2, C#4,
+		
+		F3, D4, A#2, D4,				// Theme Sequence 2
+		G3, E4, C3, E4,
+		E3, C#4, A2, C#4,
+		A3, F4, D3, F4,
+		
+		F3, D4, A#2, D4,				// Theme Sequence 3
+		G3, E4, C3, E4,
+		E3, C#4, A2, C#4,
+		A3, F4, D3, F4
+};
+
+uint32_t songBattleBassAuxDur[71] = {
+		qtrdot, eit, qtrdot, eit,
+		qtrdot, eit, qtrdot, eit,
+		qtrdot, eit, qtrdot, eit,
+		
+		qtrdot, eit, qtrdot, eit,
+		qtrdot, eit, qtrdot, eit,
+		qtrdot, eit, hlf,
+		
+		eitdot, eit, eit/2, eit,		// Theme Sequence 1
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		
+		eitdot, eit, eit/2, eit,		// Theme Sequence 2
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		
+		eitdot, eit, eit/2, eit,		// Theme Sequence 3
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit,
+		eitdot, eit, eit/2, eit
+};

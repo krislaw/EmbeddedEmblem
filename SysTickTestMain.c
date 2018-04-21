@@ -49,6 +49,8 @@ void EnableInterrupts(void);  // Enable interrupts
 
 void SoundTest(){
 	PlaySong();
+//	SysTick_Wait10ms(200000);
+	StopSong();
 }
 
 void GraphicsTest(){
@@ -60,6 +62,9 @@ void GraphicsTest(){
 			PrintTile(x, y);
 		}
 	}
+	
+	PrintSprite(0, 0, 0);
+	PrintSprite(0, 7, 7);
 }
 
 
@@ -83,7 +88,6 @@ void ButtonTest(){
 }
 
 void JSTest(){
-	while(1){
 		uint32_t x = JSgetX();
 		uint32_t y = JSgetY();
 		
@@ -97,12 +101,7 @@ void JSTest(){
 			ST7735_OutChar((y/i) + '0');
 			y = y % i;
 		}
-	}
 }
-
-
-		
-
 
 	/* === MAIN INITIALIZATIONS ====
 	*
@@ -110,17 +109,12 @@ void JSTest(){
 	*/
 	
 int main(void){
-	//PLL_Init(Bus80MHz);         // set system clock to 50 MHz
+	PLL_Init(Bus80MHz);         // set system clock to 80 MHz
 	DisableInterrupts();
-	InputInit(); //buttons and switches, uses SysTick Timer?
-	
+	InputInit();	
 	GraphicsInit(); //ST7735 and resources, will use Timer 4
+	ShowStartupScreen();
 	SoundInit();	//SSI DAC, uses Timer0A, Timer1, Timer2
-	
-	/* === MAIN WHILE LOOP ====
-	*
-	*
-	*/
 	
 	//LED SETUP
 	SYSCTL_RCGCGPIO_R |= 0x00000020; // activate clock for port F
@@ -129,17 +123,33 @@ int main(void){
   GPIO_PORTF_DEN_R |= 0x0E;     // enable digital I/O on PF3,PF2,PF1  
 		
 	EnableInterrupts();
+	
+	RunGame();
+	
 		/* Tests */
-	SoundTest();
-		
+	
+	/* === MAIN WHILE LOOP ====
+	*
+	*
+	*/
   while(1){
-//    GPIO_PORTF_DATA_R = GPIO_PORTF_DATA_R^0x04; // toggle PF2		
-		SysTick_Wait10ms(100);
-		//GraphicsTest();
-		//ButtonTest();
-		SysTick_Wait10ms(100);
+    GPIO_PORTF_DATA_R = GPIO_PORTF_DATA_R^0x04; // toggle PF2		
+		SoundTest();
+//		SysTick_Wait10ms(100);
+		GraphicsTest();
+//		SysTick_Wait10ms(100);
 		JSTest();
-		SysTick_Wait10ms(100);
+//		SysTick_Wait10ms(100);
+//		SoundTest();
 		//return 0;
+		/*
+		volatile int x;
+		volatile int y;
+		for(int i = 0; i < 100; i++){
+			if(JSgetX() > 3000) { x = 1; }
+			if(JSgetX() < 3000) { x = -1; }
+		CursorTest(x, 0);
+		}
+		*/
   }
 }

@@ -7,7 +7,7 @@ Controls all buttons and Joystick Logic
 #include "../inc/tm4c123gh6pm.h"
 #include "SysTick.h"
 #include "Input.h"
-#include "Timer3.h"
+#include "Timer3A.h"
 
 //Control Pad on PE 1, 2, 3, 5
 #define upB 0x02
@@ -101,24 +101,22 @@ void ADC_In23(){
 
 
 void JSInit(){ //ADC
-	Timer3_Init(&ADC_In23, jsPeriod); // how often the adc gets read i guess
+	Timer3A_Init(&ADC_In23, jsPeriod); // how often the adc gets read i guess
 	
-  volatile unsigned long delay;
+	 volatile unsigned long delay;
+	SYSCTL_RCGCADC_R |= 0x00000001; // 1) activate ADC0
+  SYSCTL_RCGCGPIO_R |= 0x10; // 1) activate clock for Port E
 	
-  SYSCTL_RCGC2_R |= 0x00000010;   // 1) activate clock for Port E
   delay = SYSCTL_RCGC2_R;         //    allow time for clock to stabilize
+	while((SYSCTL_RCGCADC_R & 0x1) == 0){}
+		
   GPIO_PORTE_DIR_R &= ~js;      // 2) make PE4 input
   GPIO_PORTE_AFSEL_R |= js;     // 3) enable alternate function on PE2
   GPIO_PORTE_DEN_R &= ~js;      // 4) disable digital I/O on PE2
+	
+	GPIO_PORTE_PCTL_R = GPIO_PORTE_PCTL_R&0xFFFFF00F;
   GPIO_PORTE_AMSEL_R |= js;     // 5) enable analog function on PE2
-
-	//SYSCTL_RCGCADC_R |= 0x00000001; // 6) activate ADC0 ???
-  SYSCTL_RCGC0_R |= 0x00010000;   // 6) activate ADC0 ???
-  delay = SYSCTL_RCGC2_R;  
-	
-  SYSCTL_RCGC0_R &= ~0x00000300;  // 7) configure for 125K
-	
-  ADC0_PC_R &= ~0xF;              // 8) clear max sample rate field
+  ADC0_PC_R &= ~0xF;              // 8) clear max sample rate field //HELP: crashing on line
   ADC0_PC_R |= 0x1;               //    configure for 125K samples/sec
   ADC0_SSPRI_R = 0x3210;          // 9) Sequencer 3 is lowest priority
   ADC0_ACTSS_R &= ~0x0004;        // 10) disable sample sequencer 2
@@ -126,8 +124,31 @@ void JSInit(){ //ADC
   ADC0_SSMUX2_R = 0x0023;         // 12) set channels for SS2 // 2 and 3 is differential pair 1
   ADC0_SSCTL2_R = 0x0060;         // 13) no TS0 D0 IE0 END0 TS1 D1, yes IE1 END1
   ADC0_IM_R &= ~0x0004;           // 14) disable SS2 interrupts
-  ADC0_ACTSS_R |= 0x0004;         // 15) enable sample sequencer 2
+	ADC0_ACTSS_R |= 0x0004;         // 15) enable sample sequencer 2 !!! TODO: probably using sequencer 1 or 0
 	
+	
+	/* //not working ):
+  volatile unsigned long delay;
+	
+  SYSCTL_RCGC2_R |= 0x00000010;   // 1) activate clock for Port E
+  delay = SYSCTL_RCGC2_R;         //    allow time for clock to stabilize
+	
+	SYSCTL_RCGC0_R |= 0x00000001;   // 6) activate ADC0 ???
+  delay = SYSCTL_RCGC2_R; 
+	
+  GPIO_PORTE_DIR_R &= ~js;      // 2) make PE4 input
+  GPIO_PORTE_AFSEL_R |= js;     // 3) enable alternate function on PE2
+  GPIO_PORTE_DEN_R &= ~js;      // 4) disable digital I/O on PE2
+  GPIO_PORTE_AMSEL_R |= js;     // 5) enable analog function on PE2
+	
+	//SYSCTL_RCGCADC_R |= 0x00000001; // 6) activate ADC0 ???
+ 
+	GPIO_PORTE_PCTL_R = GPIO_PORTE_PCTL_R&0xFFFFF00F;
+	
+  SYSCTL_RCGC0_R &= ~0x00000300;  // 7) configure for 125K
+	
+
+	*/
 }
 
 
@@ -139,7 +160,7 @@ void InputInit(){
 	SysTickInit(); //use for debouncing?
 	ButtonInit();
 	//ControlPadInit();
-	JSInit();
+	JSInit(); // 4/2/2018: Hardfaults everywhere, pls fix
 }
 
 

@@ -64,10 +64,9 @@ dkms.conf
 *.uvopt
 *.uvgui
 *.uvgui.*
-*.uvproj
 *.plg
 *.tra
-*.bin
+bin
 *.elf
 *.swo
 *.swp
@@ -75,19 +74,10 @@ dkms.conf
 *.pdf
 *.sch
 *.pcb
+*.uvproj
 
-#Valvanoware
-CC3100/*
-CC3100_docs/*
 
-#Windows Junk
-*.exe
-*.png
+#other project resources
 *.xls
-*.iex
+*.bmp
 *.png
-
-#Hardware
-*.sch
-*.pcb
-*.fab
