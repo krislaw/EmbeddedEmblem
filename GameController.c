@@ -155,6 +155,10 @@ void CheckWin(){
 	}
 }
 
+void AnimateCharacters(){
+	
+}
+
 void SysTickInit(){
 	SYSCTL_RCGCGPIO_R |= 0x20;  // activate port F
   SysTick_Init();             // initialize SysTick timer
@@ -433,7 +437,7 @@ void GenerateTeam(void){ //hard coded player and enemy team
 }
 
 void GenerateMap(void) { //hard coded map until map select is complete
-	SetMap((const uint16_t *) &ruinMap);
+	SetMap((const uint16_t *) &valleyMap);
 	tilesOnMap = (const char**) &valleyArray;
 	
 	for(int i = 0; i < 8; i++) {
@@ -499,7 +503,7 @@ void RunGame(){
 	
 	currentState = &scanMap;
 	while(1){
-		// AnimateCharacters();
+		AnimateCharacters();
 //		 SysTick_Wait10ms(500);
 		
 		// A and B Buttons
