@@ -23,7 +23,7 @@ void SetCharacterGraphics(uint8_t id, uint16_t* sprite1, uint16_t* sprite2, uint
 	charPortraits[id] = portrait;
 }
 
-void PrintCursor(uint16_t x, uint16_t y){
+void PrintCursor(uint8_t x, uint8_t y){
 	if(x > 7 || y > 7 || y < 1) { return; }
 	
 	x = x * 16;
@@ -43,7 +43,21 @@ void PrintCursor(uint16_t x, uint16_t y){
 }
 
 
-void PrintTile(int x, int y){ //print a map tile
+void PrintMoveTile(uint8_t x, uint8_t y){
+	if(x > 7 || y > 7 || y < 1) { return; }
+	
+	x = x * 16 + 1;
+	y = (y * 16) + 33;
+	
+	for(int i = 1; i < 14; i+= 2){
+		ST7735_DrawPixel(x + i, y + 1, ST7735_BLUE); //top of square
+		ST7735_DrawPixel(x + (14 - i), y + 14, ST7735_BLUE); //bottom of square
+		ST7735_DrawPixel(x + 14, y + i, ST7735_BLUE); // right side of square
+		ST7735_DrawPixel(x + 1, y + (14 - i), ST7735_BLUE); //left side of square
+	}
+}
+
+void PrintTile(uint8_t x, uint8_t y){ //print a map tile
 	//top left is 0,0 and bottom right is 7, 7
 	x = x * 16;
 	y = (y * 16);
@@ -61,7 +75,7 @@ void PrintTile(int x, int y){ //print a map tile
 #define SpriteWidth 15
 #define BgColor 0x4D84
 
-void PrintSprite(uint8_t id, uint16_t x, uint16_t y){ //which sprite to print and where 
+void PrintSprite(uint8_t id, uint8_t x, uint8_t y){ //which sprite to print and where 
 
 	uint16_t xs = (x * 16);
 	uint16_t ys = (y * 16) + SpriteYOffset;
@@ -135,7 +149,7 @@ void ShowMap(void){
 }
 
 void StatOut(uint16_t stat){
-	if(stat > 10) { 	ST7735_OutChar(stat/10 + '0'); 	}
+	if(stat > 9) { 	ST7735_OutChar(stat/10 + '0'); 	}
 	else { ST7735_OutChar(' '); }
 	ST7735_OutChar(stat % 10 + '0');
 }

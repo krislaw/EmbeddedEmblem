@@ -1,10 +1,10 @@
 #include "CharActions.h"
 #include <stdlib.h>
 
-uint8_t validMoves[2][25];
+uint8_t validMoves[2][26];
 uint8_t validTargets[2][8];
 
-void getValidMoves(uint8_t x, uint8_t y, int16_t mapGrid[8][8], int16_t charGrid[8][8], uint8_t moveAmt){
+void getValidMoves(uint8_t x, uint8_t y, const char** mapGrid, int16_t** charGrid, uint8_t moveAmt){
 	uint8_t xCoor, yCoor;
 	int moveIdx = 0;
 	int i;
@@ -25,11 +25,9 @@ void getValidMoves(uint8_t x, uint8_t y, int16_t mapGrid[8][8], int16_t charGrid
 		}
 	}
 	
-	if(moveIdx<25){
-		//add end sentinel
-		validMoves[0][moveIdx] = 0xFF;
-		validMoves[0][moveIdx] = 0xFF;
-	}
+	//add end sentinel
+	validMoves[0][moveIdx] = 0xFF;
+	validMoves[1][moveIdx] = 0xFF;
 }
 
 void getValidTargets(uint8_t x, uint8_t y, int16_t charGrid[8][8]){

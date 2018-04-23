@@ -210,8 +210,14 @@ void ScanMapA(){
 	else{ //not a valid character
 		return; 
 	}
-	//generate move grid
-	//TODO
+	//generate movement grid on global: validMoves
+	getValidMoves(mapX, mapY, tilesOnMap, (int16_t **) unitsOnMap, units[unitsOnMap[mapX][mapY]].id);
+	
+	int16_t i = 0;
+	while(validMoves[0][i] != 0xFF){
+		PrintMoveTile(validMoves[0][i], validMoves[1][i]);
+		i++;
+	};
 	
 	//go to next state
 	NextState();
@@ -420,14 +426,14 @@ void PrintMapAll(){
 
 void GenerateTeam(void){ //hard coded player and enemy team
 	units[0] = protagonists[0]; units[0].id = 0;
-	units[1] = protagonists[1]; units[1].id = 1;
+	units[1] = protagonists[6]; units[1].id = 1;
 	units[2] = protagonists[5]; units[2].id = 2;
 	units[3] = villains[0]; units[3].id = 3; units[3].name = (char*) villainNames[11];
 	units[4] = villains[1]; units[4].id = 4; units[4].name = (char*) villainNames[17];
 	units[5] = villains[5]; units[5].id = 5; units[5].name = (char*) villainNames[19];
 	
 	SetCharacterGraphics(0, (uint16_t *) &slance1, (uint16_t *) &slance2, (uint16_t *) &slance1face);
-	SetCharacterGraphics(1, (uint16_t *) &slance3, (uint16_t *) &slance3, (uint16_t *) &slance3face);
+	SetCharacterGraphics(1, (uint16_t *) &smage1, (uint16_t *) &smage2, (uint16_t *) &smage1face);
 	SetCharacterGraphics(2, (uint16_t *) &ssword3, (uint16_t *) &ssword3, (uint16_t *) &ssword3face);
 	SetCharacterGraphics(3, (uint16_t *) &mmage1, (uint16_t *) &mmage1, (uint16_t *) &mmage1face);
 	SetCharacterGraphics(4, (uint16_t *) &massassin1, (uint16_t *) &massassin1, (uint16_t *) &massasin1face);
@@ -495,7 +501,6 @@ void RunGame(){
 	
 	//BuildTeam();
 	GenerateTeam();
-	
 	//SelectMap();
 	GenerateMap();
 	

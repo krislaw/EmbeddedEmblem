@@ -39,14 +39,15 @@ struct Unit{
 }Unit;
 
 //TODO: balance stats bc how do???
-
-const struct Unit protagonists[6] = { //TODO: add tome, armor options
-	{0, 1, "Kris", lance, 20, 20, 18, 8, 8, 6, 2}, 			//use slance1
+const struct Unit protagonists[8] = {
+	{0, 1, "Kris", lance, 20, 20, 18, 8, 11, 8, 2}, 			//use slance1
 	{0, 1, "Yuriy", lance, 18, 18, 18, 12, 2, 10, 2}, 	//use slance3
 	{0, 1, "Hanah", staff, 14, 14, 14, 10, 12, 10, 2}, 	//use scleric1
 	{0, 1, "Max", axe, 17, 17, 21, 8, 2, 12, 2}, 				//use saxe1
-	{0, 1, "Steph", sword, 15, 15, 18, 6, 6, 6, 2},			//use ssword1
-	{0, 1, "Brand", sword, 15, 15, 18, 6, 6, 6, 2}			//use ssword3
+	{0, 1, "Jen", sword, 15, 15, 18, 6, 6, 6, 2},				//use ssword1
+	{0, 1, "Brand", sword, 15, 15, 18, 6, 6, 6, 2},			//use ssword3
+	{0, 1, "Steph", tome, 16, 16, 19, 8, 11, 11, 2},			//use smage1
+	{0, 1, "Ali", armor, 26, 26, 16, 17, 6, 4, 1}				//use sarmor1
 };
 
 const struct Unit villains[6] = { //TODO: add lance options
@@ -60,7 +61,7 @@ const struct Unit villains[6] = { //TODO: add lance options
 
 const char villainNames[30][6] = { //randomly generate villain names, shoutout to SEC Eweek 2018 for theme
 	"Zeus", "Hera", "Poise", "Demtr", "Ares",
-	"Athen", "Armis", "Heph", "Dite", "Ermes",
+	"Athen", "Armis", "Heph", "Dite", "Eres",
 	"Dions", "Hades", "Hypno", "Nike", "Janus",
 	"Nemis", "Iris", "Hecat", "Tyche", "Percy",
 	"Calip", "Clio", "Eutre", "Erato", "Mepho",

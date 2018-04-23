@@ -16,11 +16,12 @@ void GraphicsInit(void);
 
 void SetMap(const uint16_t* map); // what image to load, character sprites, map size if we implement scrolling, ect.
 void ShowMap(void);
-void PrintTile(int tilex, int tiley);
-void PrintCursor(uint16_t x, uint16_t y);
+void PrintTile(uint8_t tilex, uint8_t tiley);
+void PrintMoveTile(uint8_t x, uint8_t y);
+void PrintCursor(uint8_t x, uint8_t y);
 
 void SetCharacterGraphics(uint8_t id, uint16_t* sprite1, uint16_t* sprite2, uint16_t* portrait);
-void PrintSprite(uint8_t id, uint16_t x, uint16_t y);
+void PrintSprite(uint8_t id, uint8_t x, uint8_t y);
 
 void ShowStartupScreen(void);
 void ShowLoseScreen(void);

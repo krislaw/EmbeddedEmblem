@@ -35,23 +35,21 @@ void ButtonInit(){ //AB: PF3, PF4
   GPIO_PORTF_DEN_R |= (Abut | Bbut);         // 7) enable digital port
 	GPIO_PORTF_IS_R &= ~(Abut | Bbut);     // (d)   is edge-sensitive
   GPIO_PORTF_IBE_R &= ~(Abut | Bbut);    //     _ is not both edges
-  GPIO_PORTF_IEV_R &= ~(Abut | Bbut);    //     _ falling edge event
+  GPIO_PORTF_IEV_R |= (Abut | Bbut);    //     _ rising edge event
   GPIO_PORTF_ICR_R = (Abut | Bbut);      // (e) clear flag5 & 6
   GPIO_PORTF_IM_R |= (Abut | Bbut);      // (f) arm interrupt on Port F
 
 	NVIC_PRI7_R= (NVIC_PRI7_R& ~0xE0000)|0x00600000; // Port F, bits 23-21 current at priority 3
-  //NVIC_EN0_R = 0x40000000; // enable interrupt 4 in NVIC
-		//TODO: buttons disabled because they stop everything else from running even tho its not on????
+  NVIC_EN0_R = 0x40000000; // enable interrupt 4 in NVIC
 	AB = 0;
 }
 
 void GPIOPortF_Handler(void){
-  if(GPIO_PORTF_RIS_R&Abut){  // poll PE4
-    GPIO_PORTE_ICR_R = 0x10;  // acknowledge flag4
+	GPIO_PORTF_ICR_R = (Abut | Bbut);  	// acknowledge flag5
+  if((GPIO_PORTF_DATA_R&Abut) > 0){  // poll PE4
     AB |= 1;                  // signal SW1 occurred
   }
-  if(GPIO_PORTE_RIS_R&0x20){  // poll PE5
-    GPIO_PORTE_ICR_R = 0x20;  // acknowledge flag5
+  if((GPIO_PORTE_DATA_R&Bbut) > 0){  // poll PE5 
     AB |= 2;                  // signal SW2 occurred
   }
 }
