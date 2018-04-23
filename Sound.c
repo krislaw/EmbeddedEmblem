@@ -52,7 +52,7 @@ void StopSong(){
 void Timer0Task(void){	
 	waveIndex++;
 	if(waveIndex >= wavesize) { waveIndex = 0; }
-	DAC_Out(currentInstrument[waveIndex] * noteAmp / 1600 );
+	DAC_Out(currentInstrument[waveIndex] * noteAmp / 400 );
 }	
 
 	/* controls envelope for each note of the song */
@@ -71,9 +71,11 @@ void Timer2Task(void){
 		Timer0A_Init((&Timer0Task), currentSong->note[noteIndex] / 2); //divide by 2 becuause those notes were for 32 wave array
 		Timer2A_Init((&Timer2Task), currentSong->noteDuration[noteIndex]);
 		if(rest == 1){
+		Timer0A_Enable();
 		Timer1A_Enable();
 			rest = 0;
 		}
+	Timer2A_Enable();
 	}
 }
 

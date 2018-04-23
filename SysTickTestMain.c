@@ -48,7 +48,7 @@ void EnableInterrupts(void);  // Enable interrupts
 void SoundTest(){
 	PlaySong();
 //	SysTick_Wait10ms(200000);
-	StopSong();
+//	StopSong();
 }
 
 void GraphicsTest(){
@@ -140,7 +140,11 @@ int main(void){
 	//DisableInterrupts(); //we out here testin'
 		
 	ClearButtonPush(); //ignore presses during setup
-	while(GetButtonPush == 0){ }
+	while(GetButtonPush() == 0){ }
+	
+	SoundTest();
+	while(1){
+	}
 	
 		/* === MAIN CODE FOR TESTING OR RUNNING ====
 	* Run Tests will run the above tests on the hardware

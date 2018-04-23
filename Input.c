@@ -16,8 +16,8 @@ Controls all buttons and Joystick Logic
 #define rightB 0x20
 
 //AB on PF 3,4
-#define Abut 0x08
-#define Bbut 0x10
+#define Abut 0x10
+#define Bbut 0x08
 uint8_t AB;
 
 //Joystick on PE 1, 2
@@ -45,13 +45,13 @@ void ButtonInit(){ //AB: PF3, PF4
 }
 
 void GPIOPortF_Handler(void){
-	GPIO_PORTF_ICR_R = (Abut | Bbut);  	// acknowledge flag5
-  if((GPIO_PORTF_DATA_R&Abut) > 0){  // poll PE4
+  if((GPIO_PORTF_RIS_R & Abut) > 0){  // poll PE4
     AB |= 1;                  // signal SW1 occurred
   }
-  if((GPIO_PORTE_DATA_R&Bbut) > 0){  // poll PE5 
+  if((GPIO_PORTE_RIS_R & Bbut) > 0){  // poll PE5 
     AB |= 2;                  // signal SW2 occurred
   }
+	GPIO_PORTF_ICR_R = (Abut | Bbut);  	// acknowledge flag5
 }
 
 uint8_t GetButtonPush(void){

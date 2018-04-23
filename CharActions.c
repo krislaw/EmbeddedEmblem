@@ -13,15 +13,22 @@ void getValidMoves(uint8_t x, uint8_t y, const char** mapGrid, int16_t** charGri
 	for(i = -moveAmt; i< moveAmt; i++){
 		if(moveIdx == 25) break;
 		j = 0;
-		xCoor = i;
-		for(j = (- (moveAmt-i)); j < (moveAmt-i); j++){
-			yCoor = j;
-			if(abs(i) + abs(j) >= moveAmt) {break;}
-			if(mapGrid[xCoor][yCoor] == 0 && charGrid[xCoor][yCoor] == 0){
-				validMoves[0][moveIdx] = xCoor;
-				validMoves[1][moveIdx] = yCoor;
-				moveIdx++;
+		xCoor = i+x;
+		if(xCoor > 7) { } //overflow, do nothing
+		else{
+			for(j = (- (moveAmt-i)); j < (moveAmt-i); j++){
+				yCoor = j+y;
+				if(yCoor > 7) { } //overflow, do nothing
+				else{
+					if(abs(i) + abs(j) >= moveAmt) {break;}
+					if(mapGrid[xCoor][yCoor] < 2 && charGrid[xCoor][yCoor] == -1){
+						validMoves[0][moveIdx] = xCoor;
+						validMoves[1][moveIdx] = yCoor;
+						moveIdx++;
+				}
 			}
+			}
+
 		}
 	}
 	
