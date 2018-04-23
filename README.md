@@ -3,6 +3,14 @@
 # Embedded Emblem
 #####A Fire Emblem Heroes clone for the TM4C123 Launchpad
 
+### Progess
+- [x] PCB Sent for Printing 3/25/18 - krislaw
+- [x] Analog Input Drivers work 4/20/18 - krislaw
+- [ ] Write and Test software for campaign - krislaw
+- [ ] Integrate server with map's "Wait for Enemy" state - darnells
+- [ ] Write and Test software for teambuild - krislaw
+- [ ] Figure out and Implement Animations - krislaw
+
 ### Software
 ##### Kris wrote the initialization using Valvanoware, drivers for the speaker, joystick, and LCD, and the control flow for the game.
 COMING SOON: Tutorial on how to play
