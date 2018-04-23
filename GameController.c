@@ -437,7 +437,7 @@ void GenerateTeam(void){ //hard coded player and enemy team
 }
 
 void GenerateMap(void) { //hard coded map until map select is complete
-	SetMap((const uint16_t *) &valleyMap);
+	SetMap((const uint16_t *) &templeMap);
 	tilesOnMap = (const char**) &valleyArray;
 	
 	for(int i = 0; i < 8; i++) {
