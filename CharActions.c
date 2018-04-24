@@ -8,7 +8,7 @@ uint8_t validTargets[2][8];
 uint16_t numMoves;
 
 //kris version for test
-void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt){
+void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt, const char** mapGrid, int16_t** charGrid){
 	if(moveAmt < 1 || moveAmt > 3) { return; } //moveAmt must be 0, 1, 2 
 	int16_t xmin = x;
 	int16_t xmax = x + 1;
@@ -18,9 +18,11 @@ void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt){
 	for(int16_t i = (y - moveAmt); i < (y + moveAmt + 1); i++){
 		for(int16_t j = xmin; j < xmax; j++){
 			if(i > 0 && i < 8 && j > -1 && j < 8){
-				validMoves[0][numMoves] = j;
-				validMoves[1][numMoves] = i;
-				numMoves++;
+				if(mapGrid[j][i] <1 && charGrid[j][i]==-1){
+					validMoves[0][numMoves] = j;
+					validMoves[1][numMoves] = i;
+					numMoves++;
+				}
 			}
 		}
 		if(i == y) { dflag = true; }
