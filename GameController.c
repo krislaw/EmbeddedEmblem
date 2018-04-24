@@ -514,7 +514,6 @@ void RunGame(){
 	
 	currentState = &scanMap;
 	while(1){
-		PrintMoveTile(3, 3); //
 //		AnimateCharacters();
 //		 SysTick_Wait10ms(500);
 		

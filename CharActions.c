@@ -5,30 +5,28 @@
 
 uint8_t validMoves[2][maxMoves];
 uint8_t validTargets[2][8];
+uint16_t numMoves;
 
-// by Kris
-//TODO: can't pass through enemies... that's too much work rn honestly it's gonna be a recursive mess
-//either have to use recursion and ignore overlaps that are already in the array
-//or do some kind of actual bfs that i can't code in 5 mins so its work
-
+//kris version for test
 void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt){
-	validMoves[0][0] = x;
-	validMoves[1][0] = y;
-	int numMoves = 1;
-	for(int16_t ym = y - moveAmt; ym < (y + moveAmt + 1); ym++){ //start from the bottom
-		if(ym < 8 && ym > 0){ //ignore out of bounds
-			for(int16_t xm = x - moveAmt; xm < (x + moveAmt + 1); xm++){
-				if(xm > - 1 && xm < 8){ //ignore out of bounds
-					if(tilesOnMap[0][xm][ym] < 0x02){ //valid location!!
-						if(unitsOnMap[xm][ym] == -1){ //checkin which crashed fuk
-							validMoves[0][numMoves] = xm;
-							validMoves[1][numMoves] = ym;
-							numMoves++;
-						}
-					}
-				}
+	if(moveAmt < 1 || moveAmt > 3) { return; } //moveAmt must be 0, 1, 2 
+	int16_t xmin = x;
+	int16_t xmax = x + 1;
+	numMoves = 0;
+	bool dflag = false; //hit halfway for y
+	
+	for(int16_t i = (y - moveAmt); i < (y + moveAmt + 1); i++){
+		for(int16_t j = xmin; j < xmax; j++){
+			if(i > 0 && i < 8 && j > -1 && j < 8){
+				validMoves[0][numMoves] = j;
+				validMoves[1][numMoves] = i;
+				numMoves++;
 			}
 		}
+		if(i == y) { dflag = true; }
+		
+		if(dflag){ xmin++; xmax--; }
+		else{ xmax++; xmin--; }
 	}
 	validMoves[0][numMoves] = 0xFF;
 	validMoves[1][numMoves] = 0xFF;
