@@ -18,11 +18,7 @@
 /* ============= Gameplay Registers ====================
 * Values initialized at the beginning, stored until the game is restarted.
 */
-struct Unit units[8]; //[0, 1, 2] used for player characters, [3, ... 7] used for npcs when a map is selected.
-
-//cursor positions for mission screen
-uint16_t missionScreenY;
-uint16_t missionScreenYmax;
+struct Unit units[8]; //[0, 1, 2] used for player characters, [3, ... 7] used for enemies
 
 //cursor positions for character select screen
 uint16_t buildTeamX;
@@ -47,10 +43,10 @@ uint16_t mapX;
 uint16_t mapY;
 
 //state-specific regs
-struct Unit* selectedUnit; 		//used for charSelectedState
-uint16_t selectedX;				
-uint16_t selectedY;
-uint16_t attackTargetId;
+struct Unit* selectedUnit; 		//set in ScanMap A, used in selectAttackTarget
+uint16_t targetX;							//set in TentativeMove, use for ApplyTentMove
+uint16_t targetY;
+uint16_t attackTargetId;			//set in ChangeAttack Target, used in SelectAttackTarget
 
 //allowable locations for characters/cursors
 #define Xmin 0
@@ -149,7 +145,7 @@ void CheckLose(){
 void CheckWin(){
 		if((alive & npcVector) == 0){
 		ShowWinScreen();
-		//level up players and shit idk
+		//level up players and go to the next map
 	}
 	else{
 		NextState();
@@ -174,12 +170,14 @@ void SysTickInit(){
 /* ======= FUNCTIONS FOR MAP & MAP STATES =============*
 * UpdateCursor(dX, dY), UpdateInfoScreen(character id)
 * scanMap: onA, onScroll
-* charSelected: checkValidAction (A), TentativeMove (Scroll),
+* charSelected: ApplyTentMove (A), TentativeMove (Scroll),
 * charActionState: SelectAttack Target (A), ChangeAttackTarget (Scroll), Calculate Combat for preview
 * waitForEnemy: idle and wait for the server i guess
 */
 
 void UpdateCursor(int8_t dX, int8_t dY){
+	mapOldX = mapX;
+	mapOldY = mapY;
 	//change cursor location, NO PRINTING HERE!!!	
 	switch(currentState->StateNum){
 		case 3: //scanMap scroll
@@ -207,30 +205,26 @@ void UpdateInfoScreen(uint8_t id){
 			units[id].RES, units[id].SPD);
 }
 
+/* scanMap state A - finished & verified */
 void ScanMapA(){
 	//select a char
 	if((unitsOnMap[mapX][mapY] > -1) && (unitsOnMap[mapX][mapY] < 3)){
 		selectedUnit = &units[unitsOnMap[mapX][mapY]];
-		selectedX = mapX;
-		selectedY = mapY;
 	}
 	else{ //not a valid character
 		return; 
 	}
 	//generate movement grid on global: validMoves
 	GetValidMoves(mapX, mapY, units[unitsOnMap[mapX][mapY]].MOV);
-	
 	int16_t i = 0;
-	while(validMoves[0][i] != 0xFF){
+	while(validMoves[0][i] != END_SENTINAL){
 		PrintMoveTile(validMoves[0][i], validMoves[1][i]);
 		i++;
 	};
-	
-	//go to next state
 	NextState();
 }
 
-/* scanMap state onScroll - finished, TEST */
+/* scanMap state onScroll - finished & verified */
 void ScanMapScroll(){
 	//reprint map square
 	PrintTile(mapOldX, mapOldY);
@@ -249,19 +243,27 @@ void ScanMapScroll(){
 	}
 }
 
-void CheckValidAction(){
-	//check if move is valid
-	
+/* ApplyTentMove() */
+void ApplyTentMove(){
+	//set global for the selected characters location
+	targetX = mapX;
+	targetY = mapY;
 	//go to action state
 	NextState();
 }
 
 void TentativeMove(){
-	//don't let cursor move outside of move grid
+	//Potential Bug Notice: UpdateCursor should keep in bounds pls
+	//reprint old squares
+	PrintTile(mapOldX, mapOldY);
+	PrintMoveTile(mapOldX, mapOldY);
+	//reprint people if you stood behind them
+	if(unitsOnMap[mapOldX][mapOldY + 1] != -1) {
+		PrintSprite(unitsOnMap[mapOldX][mapOldY], mapOldX, mapOldY + 1);
+	}
 	
-	//reprint move grid from character's original location
-	
-	//reprint cursor
+	PrintCursor(mapX, mapY);
+	PrintSprite(selectedUnit->id, mapX, mapY);
 }
 
 //Preview values calculated from combat
@@ -430,7 +432,8 @@ void PrintMapAll(){
 * addToTeam: TODO
 */
 
-void GenerateTeam(void){ //hard coded player and enemy team
+/*Generate Team - hard coded player and enemy team */
+void GenerateTeam(void){ 
 	units[0] = protagonists[0]; units[0].id = 0;
 	units[1] = protagonists[6]; units[1].id = 1;
 	units[2] = protagonists[5]; units[2].id = 2;
@@ -447,8 +450,8 @@ void GenerateTeam(void){ //hard coded player and enemy team
 	
 	numCharacters = 6;
 }
-
-void GenerateMap(void) { //hard coded map until map select is complete
+/* GenerateMap - hard coded map until map select is complete */
+void GenerateMap(void) { 
 	SetMap((const uint16_t *) &templeMap);
 	tilesOnMap = &templeArray; 
 	
@@ -488,10 +491,8 @@ void GameInit(){
 	//cursor initialization
 	mapX = 0;
 	mapY = 7;
-	missionScreenY = 0;
 	buildTeamX = 0;
 	buildTeamY = 0;
-	numCharacters = 0;
 }
 
 void InfoScreenTest(){
@@ -503,19 +504,40 @@ void InfoScreenTest(){
 	}
 }
 
+/* ================= Run Game ===================
+* This is the main for all of our software in the game
+* It loops until you lose or beat the whole game
+*
+*/
 void RunGame(){
 	PlaySong();
-	//BuildTeam();
+	
+	//TODO: Character Building... I'm thinking 1) desert, 2) valley, 3) temple, 4) ruin
+/*
+	BuildTeam();
+	for(int i = 0; i < numMissions; i++){
+		MissionInit(i);
+		RuinMission(); //if you lose, have to restart system, if you return here you won
+		LevelUp(alive&pcVector); //level up living characters
+		AddToTeam(alive&pcVector); //choose new level 1 if you died
+	}
+	*/
+	
 	GenerateTeam();
-	//SelectMap();
 	GenerateMap();
+	
 	PrintMapAll();
 	ClearButtonPush(); //ignore buttons during initialization
 	
 	currentState = &scanMap;
+	/* ======== RUN GAME MAIN WHILE LOOP ============
+	* 
+	*
+	*/
+	
 	while(1){
 //		AnimateCharacters();
-//		 SysTick_Wait10ms(500);
+//		SysTick_Wait10ms(500);
 		
 		// A and B Buttons
 		int buttons = GetButtonPush();
@@ -530,8 +552,6 @@ void RunGame(){
 		int8_t dX = GetX();
 		int8_t dY = GetY();
 		if( (dX | dY) != 0) {
-			mapOldX = mapX;
-			mapOldY = mapY;
 			UpdateCursor(dX, dY);
 			(*currentState->onScroll)();
 		}
@@ -562,7 +582,7 @@ const struct State chooseMap;
 const struct State initializeMap;
 
 const struct State scanMap = {3, &ScanMapA, &EmptyFunc, &ScanMapScroll};
-const struct State charSelected = {4, &CheckValidAction, &UndoState, &TentativeMove};
+const struct State charSelected = {4, &ApplyTentMove, &UndoState, &TentativeMove};
 const struct State charActionState = {5, &SelectAttackTarget, &UndoState, &ChangeAttackTarget};
 const struct State checkWin = {6, &EmptyFunc, &EmptyFunc, &EmptyFunc };
 const struct State waitForEnemy = {7, &EmptyFunc, &EmptyFunc, &EmptyFunc };

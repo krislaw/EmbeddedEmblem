@@ -3,13 +3,12 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-uint8_t validMoves[2][maxMoves];
-uint8_t validTargets[2][8];
+uint8_t validMoves[2][maxMoves + 1];
+uint8_t validTargets[maxTargets + 1];
 uint16_t numMoves;
 
-//kris version for test
-void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt, const char** mapGrid, int16_t** charGrid){
-	if(moveAmt < 1 || moveAmt > 3) { return; } //moveAmt must be 0, 1, 2 
+void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt){
+	if(moveAmt > 3) { return; } //moveAmt must be 0, 1, 2 
 	int16_t xmin = x;
 	int16_t xmax = x + 1;
 	numMoves = 0;
@@ -18,7 +17,7 @@ void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt, const char** mapGrid, 
 	for(int16_t i = (y - moveAmt); i < (y + moveAmt + 1); i++){
 		for(int16_t j = xmin; j < xmax; j++){
 			if(i > 0 && i < 8 && j > -1 && j < 8){
-				if(mapGrid[j][i] <1 && charGrid[j][i]==-1){
+				if(tilesOnMap[0][j][i] < 2 && unitsOnMap[j][i]== -1){
 					validMoves[0][numMoves] = j;
 					validMoves[1][numMoves] = i;
 					numMoves++;
@@ -30,8 +29,8 @@ void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt, const char** mapGrid, 
 		if(dflag){ xmin++; xmax--; }
 		else{ xmax++; xmin--; }
 	}
-	validMoves[0][numMoves] = 0xFF;
-	validMoves[1][numMoves] = 0xFF;
+	validMoves[0][numMoves] = END_SENTINAL;
+	validMoves[1][numMoves] = END_SENTINAL;
 }
 
 //checks if given coordinates are in last generated validMove array
@@ -44,58 +43,28 @@ bool CheckInValidMoves(uint8_t x, uint8_t y){
 	return false;
 }
 
-//doesn't work
-void getValidMoves2(uint8_t x, uint8_t y, const char** mapGrid, int16_t** charGrid, uint8_t moveAmt){
-	uint8_t xCoor, yCoor;
-	int moveIdx = 0;
-	int i;
-	int j;
+void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range){ //possible to do: add a range
+	if(range != 2) {range = 1; } //range must be 1 or 2
+	int16_t xmin = x;
+	int16_t xmax = x + 1;
+	uint16_t numTargets = 0;
+	bool dflag = false; //hit halfway for y
 	
-	for(i = -moveAmt; i< moveAmt; i++){
-		if(moveIdx == 25) break;
-		j = 0;
-		xCoor = i+x;
-		if(xCoor > 7) { } //overflow, do nothing
-		else{
-			for(j = (- (moveAmt-i)); j < (moveAmt-i); j++){
-				yCoor = j+y;
-				if(yCoor > 7) { } //overflow, do nothing
-				else{
-					if(abs(i) + abs(j) >= moveAmt) {break;}
-					if(mapGrid[xCoor][yCoor] < 2 && charGrid[xCoor][yCoor] == -1){
-						validMoves[0][moveIdx] = xCoor;
-						validMoves[1][moveIdx] = yCoor;
-						moveIdx++;
+	for(int16_t i = (y - range); i < (y + range + 1); i++){
+		for(int16_t j = xmin; j < xmax; j++){
+			if(i > 0 && i < 8 && j > -1 && j < 8){
+				if(unitsOnMap[j][i] > 2){ //is a villain
+					validTargets[numTargets] = unitsOnMap[j][i];
+					numTargets++;
 				}
 			}
-			}
-
 		}
+		if(i == y) { dflag = true; }
+		
+		if(dflag){ xmin++; xmax--; }
+		else{ xmax++; xmin--; }
 	}
 	
-	//add end sentinel
-	validMoves[0][moveIdx] = 0xFF;
-	validMoves[1][moveIdx] = 0xFF;
-}
-
-void GetValidTargets(uint8_t x, uint8_t y, int16_t charGrid[8][8]){
-	int16_t i, j;
-	int16_t targetIdx = 0;
-	for( i = x -1; i< x+1; i ++){
-		if(targetIdx ==8) break;
-		for(j = y-1; j < y+1; j++){
-			if (i == x && j == y) {continue;}
-			if(charGrid[i][j] == 1){
-				validTargets[0][targetIdx] = i;
-				validTargets[1][targetIdx] = j;
-				targetIdx++;
-			}
-		}
-	}
+	validTargets[numTargets] = END_SENTINAL;
 	
-	if(targetIdx < 8){
-		//add end sentinel
-		validTargets[0][targetIdx] = 0xFF;
-		validTargets[1][targetIdx] = 0xFF;
-	}
 }

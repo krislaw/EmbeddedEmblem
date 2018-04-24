@@ -1,6 +1,6 @@
-// Timer0A.c
+// Timer0B.c
 // Runs on LM4F120/TM4C123
-// Use Timer0A in periodic mode to request interrupts at a particular
+// Use Timer0B in periodic mode to request interrupts at a particular
 // period.
 // Daniel Valvano
 // September 11, 2013
@@ -28,7 +28,7 @@
  
 #include <stdint.h>
 #include "inc//tm4c123gh6pm.h"
-#include "Timer0A.h"
+#include "Timer0B.h"
 
 
 void DisableInterrupts(void); // Disable interrupts
@@ -36,42 +36,43 @@ void EnableInterrupts(void);  // Enable interrupts
 long StartCritical (void);    // previous I bit, disable interrupts
 void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
-void (*PeriodicTask0)(void);   // user function
+void (*PeriodicTask0B)(void);   // user function
 
 
-// ***************** Timer0A_Init ****************
+// ***************** Timer0B_Init ****************
 // Activate TIMER0 interrupts to run user task periodically
 // Inputs:  task is a pointer to a user function
 //          period in units (1/clockfreq), 32 bits
 // Outputs: none
-void Timer0A_Init(void(*task)(void), uint32_t period){long sr;
+void Timer0B_Init(void(*task)(void), uint32_t period){long sr;
   sr = StartCritical(); 
   SYSCTL_RCGCTIMER_R |= 0x01;   // 0) activate TIMER0
-  PeriodicTask0 = task;          // user function
-  TIMER0_CTL_R = 0x00000000;    // 1) disable TIMER0A during setup
+  PeriodicTask0B = task;          // user function
+  TIMER0_CTL_R = 0x00000000;    // 1) disable TIMER0B during setup
   TIMER0_CFG_R = 0x00000000;    // 2) configure for 32-bit mode
   TIMER0_TAMR_R = 0x00000002;   // 3) configure for periodic mode, default down-count settings
   TIMER0_TAILR_R = period-1;    // 4) reload value
   TIMER0_TAPR_R = 0;            // 5) bus clock resolution
-  TIMER0_ICR_R = 0x00000001;    // 6) clear TIMER0A timeout flag
+  TIMER0_ICR_R = 0x00000001;    // 6) clear TIMER0B timeout flag
   TIMER0_IMR_R = 0x00000001;    // 7) arm timeout interrupt
-  NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x20000000; // 8) priority 1
+  NVIC_PRI5_R = (NVIC_PRI5_R&0xFFFFFF1F)|0x000000C0; // 8) priority 6
 // interrupts enabled in the main program after all devices initialized
 // vector number 35, interrupt number 19
-  NVIC_EN0_R = 1<<19;           // 9) enable IRQ 19 in NVIC
-//  TIMER0_CTL_R = 0x00000001;    // 10) enable TIMER0A
+  NVIC_EN0_R = 1<<20;           // 9) enable IRQ 20 in NVIC
+//  TIMER0_CTL_R = 0x00000001;    // 10) enable TIMER0B
   EndCritical(sr);
 }
 
-void Timer0A_Disable(){
-  TIMER0_CTL_R &= ~0x00000001;    // 10) disable timer0A
+void Timer0B_Disable(){
+  TIMER0_CTL_R &= ~0x00000002;    // 10) disable timer2A
 }
 
-void Timer0A_Enable(){
-	TIMER0_CTL_R |= 0x00000001;     // 9) enable timer
+void Timer0B_Enable(){
+	TIMER0_CTL_R |= 0x00000002;     // 9) enable timer
 }
 
-void Timer0A_Handler(void){
-  TIMER0_ICR_R = TIMER_ICR_TATOCINT;// acknowledge timer0A timeout
-  (*PeriodicTask0)();                // execute user task
+void Timer0B_Handler(void){
+  TIMER0_ICR_R = TIMER_ICR_TATOCINT;// acknowledge timer0B timeout
+  (*PeriodicTask0B)();                // execute user task
+	Timer0B_Disable();									//interrupt runs once when enabled
 }

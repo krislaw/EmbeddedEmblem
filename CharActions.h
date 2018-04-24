@@ -5,16 +5,16 @@
 #include <stdbool.h>
 
 #define END_SENTINAL 0xFF
-#define maxMoves 26
-#define maxTargets
+#define maxMoves 25
+#define maxTargets 4
 
 //end sentinal is 0xFF
-extern uint8_t validMoves[2][maxMoves];
-extern uint8_t validTargets[2][8];
+extern uint8_t validMoves[2][maxMoves + 1]; //list of spaces a selected char can move to
+extern uint8_t validTargets[maxTargets + 1]; //list of ids the character can attack
 
 void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt);
 bool CheckInValidMoves(uint8_t x, uint8_t y);
 
-void GetValidTargets(uint8_t x, uint8_t y, int16_t charGrid[8][8]);
+void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range);
 
 #endif

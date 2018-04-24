@@ -5,9 +5,9 @@ Controls all buttons and Joystick Logic
 
 #include <stdint.h>
 #include "inc/tm4c123gh6pm.h"
-//#include "SysTick.h"
 #include "Input.h"
-#include "Timer3A.h"
+#include "Timer3A.h" //ADC sampling
+#include "Timer0B.h" //Button Debouncing
 
 //Control Pad on PE 1, 2, 3, 5
 #define upB 0x02
@@ -19,10 +19,20 @@ Controls all buttons and Joystick Logic
 #define Abut 0x10
 #define Bbut 0x08
 uint8_t AB;
+#define ABperiod 1000000
 
 //Joystick on PE 1, 2
 #define js 0x06
 #define jsPeriod 7000000
+
+
+void ButtonEnable(){
+ GPIO_PORTF_IM_R |= (Abut | Bbut);
+}
+
+void ButtonDisable(){
+ GPIO_PORTF_IM_R &= ~(Abut | Bbut);      // (f) arm interrupt on Port F
+}
 
 void ButtonInit(){ //AB: PF3, PF4
 		/* Initialize button PF 3 and 4 */	
@@ -42,6 +52,8 @@ void ButtonInit(){ //AB: PF3, PF4
 	NVIC_PRI7_R= (NVIC_PRI7_R& ~0xE0000)|0x00600000; // Port F, bits 23-21 current at priority 3
   NVIC_EN0_R = 0x40000000; // enable interrupt 4 in NVIC
 	AB = 0;
+		
+	Timer0B_Init(ButtonEnable, ABperiod);
 }
 
 void GPIOPortF_Handler(void){
@@ -51,7 +63,8 @@ void GPIOPortF_Handler(void){
   if((GPIO_PORTE_RIS_R & Bbut) > 0){  // poll PE5 
     AB |= 2;                  // signal SW2 occurred
   }
-	GPIO_PORTF_ICR_R = (Abut | Bbut);  	// acknowledge flag5
+	ButtonDisable();
+	Timer0B_Enable();
 }
 
 uint8_t GetButtonPush(void){
