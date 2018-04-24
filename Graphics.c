@@ -50,10 +50,10 @@ void PrintMoveTile(uint8_t x, uint8_t y){
 	y = (y * 16) + 33;
 	
 	for(int i = 1; i < 14; i+= 2){
-		ST7735_DrawPixel(x + i, y + 1, ST7735_BLUE); //top of square
-		ST7735_DrawPixel(x + (14 - i), y + 14, ST7735_BLUE); //bottom of square
-		ST7735_DrawPixel(x + 14, y + i, ST7735_BLUE); // right side of square
-		ST7735_DrawPixel(x + 1, y + (14 - i), ST7735_BLUE); //left side of square
+		ST7735_DrawPixel(x + i, y, ST7735_BLUE); //top of square
+		ST7735_DrawPixel(x + (13 - i), y + 13, ST7735_BLUE); //bottom of square
+		ST7735_DrawPixel(x + 13, y + i, ST7735_BLUE); // right side of square
+		ST7735_DrawPixel(x, y + (13 - i), ST7735_BLUE); //left side of square
 	}
 }
 

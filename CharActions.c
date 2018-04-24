@@ -12,23 +12,26 @@ uint8_t validTargets[2][8];
 //or do some kind of actual bfs that i can't code in 5 mins so its work
 
 void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt){
-	int numMoves = 0;
-	for(uint8_t ym = y - moveAmt; ym < (y + moveAmt + 1); ym++){ //start from the bottom
+	validMoves[0][0] = x;
+	validMoves[1][0] = y;
+	int numMoves = 1;
+	for(int16_t ym = y - moveAmt; ym < (y + moveAmt + 1); ym++){ //start from the bottom
 		if(ym < 8 && ym > 0){ //ignore out of bounds
-			for(uint8_t xm = x - moveAmt; xm < (x + moveAmt + 1); xm++){
-				if(xm < 8){ //ignore out of bounds
-					if((char) tilesOnMap[xm + 8*ym] < 0x02){ //valid location!!
+			for(int16_t xm = x - moveAmt; xm < (x + moveAmt + 1); xm++){
+				if(xm > - 1 && xm < 8){ //ignore out of bounds
+					if(tilesOnMap[0][xm][ym] < 0x02){ //valid location!!
 						if(unitsOnMap[xm][ym] == -1){ //checkin which crashed fuk
 							validMoves[0][numMoves] = xm;
 							validMoves[1][numMoves] = ym;
+							numMoves++;
 						}
 					}
 				}
 			}
 		}
 	}
-	validMoves[numMoves][0] = 0xFF;
-	validMoves[numMoves][1] = 0xFF;
+	validMoves[0][numMoves] = 0xFF;
+	validMoves[1][numMoves] = 0xFF;
 }
 
 //checks if given coordinates are in last generated validMove array

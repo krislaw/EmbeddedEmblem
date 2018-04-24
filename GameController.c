@@ -34,7 +34,7 @@ uint16_t buildTeamY;
 uint8_t unitXLocations[8]; 	//index is character id number
 uint8_t unitYLocations[8]; 	//index is character id number
 int16_t unitsOnMap[8][8]; 	//-1 indicates empty, else id number of character in that space
-const char** tilesOnMap;		//8x8 array describing the terrain
+const uint8_t (*tilesOnMap)[8][8];		//8x8 array describing the terrain
 uint8_t numCharacters; 			//number of characters on the current map, max 8
 uint8_t alive; 							//npc + pc vector
 uint8_t moved; 							//npc + pc vector
@@ -218,7 +218,7 @@ void ScanMapA(){
 		return; 
 	}
 	//generate movement grid on global: validMoves
-	GetValidMoves(mapX, mapY, units[unitsOnMap[mapX][mapY]].id);
+	GetValidMoves(mapX, mapY, units[unitsOnMap[mapX][mapY]].MOV);
 	
 	int16_t i = 0;
 	while(validMoves[0][i] != 0xFF){
@@ -450,7 +450,7 @@ void GenerateTeam(void){ //hard coded player and enemy team
 
 void GenerateMap(void) { //hard coded map until map select is complete
 	SetMap((const uint16_t *) &templeMap);
-	tilesOnMap = (const char**) &valleyArray;
+	tilesOnMap = &templeArray; 
 	
 	for(int i = 0; i < 8; i++) {
 		for(int j = 0; j < 8; j++){
@@ -509,11 +509,12 @@ void RunGame(){
 	GenerateTeam();
 	//SelectMap();
 	GenerateMap();
-	
 	PrintMapAll();
+	ClearButtonPush(); //ignore buttons during initialization
 	
 	currentState = &scanMap;
 	while(1){
+		PrintMoveTile(3, 3); //
 //		AnimateCharacters();
 //		 SysTick_Wait10ms(500);
 		
