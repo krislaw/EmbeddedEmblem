@@ -52,7 +52,7 @@ void StopSong(){
 void Timer0Task(void){	
 	waveIndex++;
 	if(waveIndex >= wavesize) { waveIndex = 0; }
-	DAC_Out(currentInstrument[waveIndex] * noteAmp / 400 );
+	DAC_Out(currentInstrument[waveIndex] * noteAmp / 1800 );
 }	
 
 	/* controls envelope for each note of the song */
@@ -69,6 +69,7 @@ void Timer2Task(void){
 	if(currentSong->note[noteIndex] == 0) { Timer0A_Disable(); Timer1A_Disable(); rest = 1;}
 	else{
 		Timer0A_Init((&Timer0Task), currentSong->note[noteIndex] / 2); //divide by 2 becuause those notes were for 32 wave array
+		Timer1A_Init((&Timer1Task), currentSong->noteDuration[noteIndex] >> 8);
 		Timer2A_Init((&Timer2Task), currentSong->noteDuration[noteIndex]);
 		if(rest == 1){
 		Timer0A_Enable();
@@ -83,13 +84,14 @@ void SetSong(uint16_t num){
 	switch(num){
 		case 0: currentSong = (struct Song *) &Main_Treble;
 		case 1: currentSong = (struct Song *) &Main_Bass;
-		default: currentSong = (struct Song *) &Main_Treble;
+		case 15: currentSong = (struct Song *) &Scales;
+		default: currentSong = (struct Song *) &Scales;
 	}
 }
 
 void SongInit(){
 	//setup timers with the current song
-	SetSong(1);
+	SetSong(15);
 	Timer0A_Init((&Timer0Task), currentSong->note[noteIndex]);
 	Timer1A_Init((&Timer1Task), currentSong->noteDuration[noteIndex] >> 10);
 	Timer2A_Init((&Timer2Task), currentSong->noteDuration[noteIndex]);

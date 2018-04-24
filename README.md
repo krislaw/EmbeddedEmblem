@@ -16,6 +16,7 @@ Created by @krislaw and @darnells for Valvano's EE445L class.
 ## ---> Software
 #### Kris wrote the initialization using Valvanoware, drivers for the speaker, joystick, and LCD, and the control flow for the game.
 :bangbang: COMING SOON: Tutorial on how to play
+
 :zap: Did you know? You can clone my repo and change GameController.c to add your own games that will run on the circuit! :zap:
 
 ## ---> Hardware

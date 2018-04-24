@@ -276,6 +276,35 @@ const uint32_t songBattleBassMainDur[84] = {
 };
 
 
+const uint32_t scalesNotes[40] = {
+	A2, B2, C3, D3,
+	E3, F3, G3, A3,
+	A3s, 0, B3, 0,
+	0, 0, 0, 0,
+	A5, 0, B5, 0,
+	C6, 0, D6, 0,
+	E6, 0, F6, 0,
+	G6, 0, A6, 0,
+	A6s, 0, B6, 0,
+	0, 0, 0, 0
+};
+
+const uint32_t scalesDur[40] = {
+		eit, eit, eit, eit,
+		eit, eit, eit, eit,
+		eit, eit, eit, eit,
+		whole, whole, whole, whole,
+		eit/2, eit, eit/2, eit,
+		eit/2, eit, eit/2, eit,
+		eit/2, eit, eit/2, eit,
+		eit/2, eit, eit/2, eit,	
+		eit/2, eit, eit/2, eit,	
+		whole, whole, whole, whole
+};
+
 /* song structs */
 const struct Song Main_Treble = { 152, (uint32_t *) songBattleTrebleMainNotes, (uint32_t *) songBattleTrebleMainDur };
 const struct Song Main_Bass = { 84, (uint32_t *) songBattleBassMainNotes, (uint32_t *) songBattleBassMainDur };
+
+const struct Song Scales = { 40, (uint32_t *) scalesNotes, (uint32_t *) scalesDur };
+

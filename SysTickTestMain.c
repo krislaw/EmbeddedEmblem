@@ -47,8 +47,6 @@ void EnableInterrupts(void);  // Enable interrupts
 
 void SoundTest(){
 	PlaySong();
-//	SysTick_Wait10ms(200000);
-//	StopSong();
 }
 
 void GraphicsTest(){
@@ -137,14 +135,10 @@ int main(void){
   GPIO_PORTF_DEN_R |= 0x0E;     // enable digital I/O on PF3,PF2,PF1  
 
 	EnableInterrupts();
-	//DisableInterrupts(); //we out here testin'
+	//DisableInterrupts();
 		
 	ClearButtonPush(); //ignore presses during setup
 	while(GetButtonPush() == 0){ }
-	
-	SoundTest();
-	while(1){
-	}
 	
 		/* === MAIN CODE FOR TESTING OR RUNNING ====
 	* Run Tests will run the above tests on the hardware

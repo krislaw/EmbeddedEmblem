@@ -54,7 +54,7 @@ void Timer1A_Init(void(*task)(void), uint32_t period){long sr;
   TIMER1_ICR_R = 0x00000001;    // 6) clear Timer1A timeout flag
   TIMER1_IMR_R = 0x00000001;    // 7) arm timeout interrupt
   NVIC_PRI5_R = (NVIC_PRI5_R&0xFFFF1FFF)|0x00008000; // 8) priority 4
-  NVIC_EN1_R = 1<<21;           // 9) enable IRQ 21 in NVIC
+  NVIC_EN1_R = 1 << 21;           // 9) enable IRQ 21 in NVIC
 //  Timer1A_CTL_R = 0x00000001;    // 10) enable Timer1A
   EndCritical(sr);
 }

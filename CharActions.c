@@ -5,6 +5,11 @@ uint8_t validMoves[2][26];
 uint8_t validTargets[2][8];
 
 void getValidMoves(uint8_t x, uint8_t y, const char** mapGrid, int16_t** charGrid, uint8_t moveAmt){
+	
+	if(moveAmt == 0) { return; }
+	else if(moveAmt == 1){
+		
+	}
 	uint8_t xCoor, yCoor;
 	int moveIdx = 0;
 	int i;

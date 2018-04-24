@@ -498,7 +498,7 @@ void InfoScreenTest(){
 }
 
 void RunGame(){
-	
+	PlaySong();
 	//BuildTeam();
 	GenerateTeam();
 	//SelectMap();
