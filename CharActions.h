@@ -2,15 +2,19 @@
 #define CHAR_ACTIONS_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #define END_SENTINAL 0xFF
+#define maxMoves 26
+#define maxTargets
 
 //end sentinal is 0xFF
-extern uint8_t validMoves[2][26];
+extern uint8_t validMoves[2][maxMoves];
 extern uint8_t validTargets[2][8];
 
-void getValidMoves(uint8_t x, uint8_t y, const char** mapGrid, int16_t** charGrid, uint8_t moveAmt);
+void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt);
+bool CheckInValidMoves(uint8_t x, uint8_t y);
 
-void getValidTargets(uint8_t x, uint8_t y, int16_t charGrid[8][8]);
+void GetValidTargets(uint8_t x, uint8_t y, int16_t charGrid[8][8]);
 
 #endif

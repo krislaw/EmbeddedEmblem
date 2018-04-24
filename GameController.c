@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdbool.h>
 #include "inc/SysTick.h"
 #include "inc/tm4c123gh6pm.h"
 #include "GameController.h"
@@ -190,6 +191,12 @@ void UpdateCursor(int8_t dX, int8_t dY){
 			else if(mapY == Ymax && dY > 0){ mapY = Ymax; }
 			else{mapY = mapY + dY; }
 			break;
+		case 4: //charSelected scroll
+			if(CheckInValidMoves(mapX + dX, mapY + dY)){ //function should include bounds-checking
+				mapX = mapX + dX;
+				mapY = mapY + dY;
+			}
+			break;
 		default: return;
 	}
 }
@@ -211,7 +218,7 @@ void ScanMapA(){
 		return; 
 	}
 	//generate movement grid on global: validMoves
-	getValidMoves(mapX, mapY, tilesOnMap, (int16_t **) unitsOnMap, units[unitsOnMap[mapX][mapY]].id);
+	GetValidMoves(mapX, mapY, units[unitsOnMap[mapX][mapY]].id);
 	
 	int16_t i = 0;
 	while(validMoves[0][i] != 0xFF){
@@ -234,7 +241,6 @@ void ScanMapScroll(){
 	if((mapOldY < 7) && (unitsOnMap[mapOldX][mapOldY + 1] > (-1))){
 		PrintSprite(unitsOnMap[mapOldX][mapOldY + 1], mapOldX, mapOldY + 1);
 	}
-	
 	//print cursor
 	PrintCursor(mapX, mapY);
 	//check & update info window
@@ -508,7 +514,7 @@ void RunGame(){
 	
 	currentState = &scanMap;
 	while(1){
-		AnimateCharacters();
+//		AnimateCharacters();
 //		 SysTick_Wait10ms(500);
 		
 		// A and B Buttons
