@@ -64,8 +64,9 @@ const struct State previewStats;
 const struct State addToTeam;
 
 const struct State viewTutorial; //push B from the scan 
-const struct State chooseMap;
-const struct State initializeMap;
+//const struct State chooseMap;
+//const struct State initializeMap;
+const struct State toNextMap;
 
 const struct State scanMap;
 const struct State charSelected;
@@ -118,7 +119,14 @@ void NextState(){
 			case 3: currentState = &charSelected; break;
 			case 4: currentState = &charActionState; break;
 			case 5: currentState = &checkWin; break;
-			case 6: currentState = &waitForEnemy; break;
+			case 6:
+				if((moved & pcVector) == 0) { //all characters have moved
+					currentState = &waitForEnemy;
+				}
+				else{
+					currentState = &scanMap;
+				}
+				break;
 			case 7: currentState = &checkLose; break;
 			case 8: currentState = &scanMap; break;
 			
@@ -130,11 +138,16 @@ void NextState(){
 	}
 }
 
-/* checkLose state - finished, TEST */
+/* checkLose state -  */
 void CheckLose(){
 	if((alive & pcVector) == 0){
-		ShowLoseScreen();
-		//set lose flag, do stuff to restart game
+			StopSong();
+			ShowWinScreen();
+			SetSong(5);
+			PlaySong();
+			SysTick_Wait10ms(100);
+			while(GetButtonPush() == 0) {}
+			special |= 0x1;
 	}
 	else{
 		NextState();
@@ -144,8 +157,13 @@ void CheckLose(){
 /* checkWin state - finished, TEST */
 void CheckWin(){
 		if((alive & npcVector) == 0){
-		ShowWinScreen();
-		//level up players and go to the next map
+			StopSong();
+			ShowWinScreen();
+			SetSong(6);
+			PlaySong();
+			SysTick_Wait10ms(100);
+			while(GetButtonPush() == 0) {}
+			currentState = &toNextMap;
 	}
 	else{
 		NextState();
@@ -252,6 +270,7 @@ void ApplyTentMove(){
 	NextState();
 }
 
+/* Tenatative Move - finished, need to test */
 void TentativeMove(){
 	//Potential Bug Notice: UpdateCursor should keep in bounds pls
 	//reprint old squares
@@ -267,9 +286,10 @@ void TentativeMove(){
 }
 
 //Preview values calculated from combat
+
+/* Calculate and Resolve Combat - finished, need to test */
 uint16_t defenderNewHP;
 uint16_t attackerNewHP; 
-
 void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 	//damage done to each unit
 	uint16_t damage = units[attackerId].ATK;
@@ -486,6 +506,7 @@ void BuildTeam(void){
 }
 
 
+/*Game Init - sets some variables to prepare for gameplay*/
 void GameInit(){
 	SysTick_Init();
 	//cursor initialization
@@ -493,8 +514,57 @@ void GameInit(){
 	mapY = 7;
 	buildTeamX = 0;
 	buildTeamY = 0;
+	special = 0;
 }
 
+/* Mission Init - clean registers and initialize mission */
+void MissionInit(uint8_t missionId){
+	mapX = 0;
+	mapY = 7;
+	buildTeamX = 0;
+	buildTeamY = 0;
+	special = 0;
+	
+	for(int i = 0; i < 8; i++) {
+		for(int j = 0; j < 8; j++){
+			unitsOnMap[i][j] = -1;
+		}
+	}
+		
+	uint8_t* startLocation;	
+	switch(missionId){ //tried hard not to hardcode this but pointer types conflict too much
+		case 1:
+			SetMap((const uint16_t*) &valleyMap);
+			tilesOnMap = &valleyArray;
+			numCharacters = 6;
+			startLocation = (uint8_t *) &valleyStart;
+			break;
+		case 2:
+			SetMap((const uint16_t*) &templeMap);
+			tilesOnMap = &templeArray;
+			numCharacters = 6;
+			startLocation = (uint8_t *) &templeStart;
+			break;
+		case 3:
+			SetMap((const uint16_t*) (uint8_t *) &ruinMap);
+			tilesOnMap = &ruinArray;
+			numCharacters = 6;
+			startLocation = (uint8_t *) &ruinStart;
+			break;
+		default:
+			SetMap((const uint16_t*) &desertMap);
+			tilesOnMap = &desertArray;
+			numCharacters = 6;
+			startLocation = (uint8_t *) &desertStart;
+			break;
+	}
+	for(int i = 0; i < numCharacters; i++){
+		unitXLocations[i] = startLocation[i];
+		unitYLocations[i] = startLocation[i + numCharacters]; //DEBUG: ensure that we are parsing 2D correctly
+		unitsOnMap[unitXLocations[i]][unitYLocations[i]] = i;
+		alive |= (1 << i);
+	}
+}
 void InfoScreenTest(){
 	GenerateTeam();
 	int i = 0;
@@ -578,8 +648,6 @@ const struct State previewStats = {1, &NextState, &UndoState, &EmptyFunc };
 const struct State addToTeam = {2, &NextState, &EmptyFunc, &EmptyFunc };
 
 const struct State viewTutorial; //push B from the chooseMap screen, TODO: select map screen
-const struct State chooseMap;
-const struct State initializeMap;
 
 const struct State scanMap = {3, &ScanMapA, &EmptyFunc, &ScanMapScroll};
 const struct State charSelected = {4, &ApplyTentMove, &UndoState, &TentativeMove};

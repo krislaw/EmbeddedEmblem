@@ -80,10 +80,20 @@ void Timer2Task(void){
 	}
 }
 
+/*
+* Main is 0
+* Maps are desert 1, valley 2, temple 3, ruin 4
+* Lose is 5, Win is 6
+*/
 void SetSong(uint16_t num){
 	switch(num){
 		case 0: currentSong = (struct Song *) &Main_Treble;
 		case 1: currentSong = (struct Song *) &Main_Bass;
+		case 2: currentSong = (struct Song *) &Main_Bass;
+		case 3: currentSong = (struct Song *) &Main_Bass;
+		case 4: currentSong = (struct Song *) &Main_Bass;
+		case 5: currentSong = (struct Song *) &Main_Bass;
+		case 6: currentSong = (struct Song *) &Main_Bass;
 		case 15: currentSong = (struct Song *) &Scales;
 		default: currentSong = (struct Song *) &Scales;
 	}

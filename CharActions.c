@@ -34,7 +34,6 @@ void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt){
 }
 
 //checks if given coordinates are in last generated validMove array
-// 0: true, 1: false
 bool CheckInValidMoves(uint8_t x, uint8_t y){
 	for(int i = 0; i < maxMoves; i++){
 		if((validMoves[0][i] == x) && (validMoves[1][i] == y)){ return true; }
@@ -43,6 +42,7 @@ bool CheckInValidMoves(uint8_t x, uint8_t y){
 	return false;
 }
 
+//list of villains the unit can attack
 void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range){ //possible to do: add a range
 	if(range != 2) {range = 1; } //range must be 1 or 2
 	int16_t xmin = x;
