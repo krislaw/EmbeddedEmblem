@@ -46,7 +46,9 @@ uint16_t mapY;
 struct Unit* selectedUnit; 		//set in ScanMap A, used in selectAttackTarget
 uint16_t targetX;							//set in TentativeMove, use for ApplyTentMove
 uint16_t targetY;
-uint16_t attackTargetId;			//set in ChangeAttack Target, used in SelectAttackTarget
+uint8_t attackIndex;					//set in ApplyTentMove, used in ChangeAttackTarget
+uint16_t attackTargetId;			//set in ChangeAttackTarget, used in SelectAttackTarget
+
 
 //allowable locations for characters/cursors
 #define Xmin 0
@@ -208,11 +210,21 @@ void UpdateCursor(int8_t dX, int8_t dY){
 			else{mapY = mapY + dY; }
 			break;
 		case 4: //charSelected scroll
-			if(CheckInValidMoves(mapX + dX, mapY + dY)){ //function should include bounds-checking
+			if(CheckInValidMoves(mapX + dX, mapY + dY)){ //should contain no out of bounds movement
 				mapX = mapX + dX;
 				mapY = mapY + dY;
 			}
 			break;
+		case 5: //charActionState - iterate through list of enemies
+			if(dY > 0 && validTargets[attackIndex] != 0xFF) {
+				attackIndex++;
+			}
+			else if(dY < 0 && attackIndex > 0) {
+				attackIndex--;
+			}
+			else if(dY > 0 && validTargets[attackIndex] == 0xFF){
+				attackIndex = 0;
+			}
 		default: return;
 	}
 }
@@ -266,6 +278,11 @@ void ApplyTentMove(){
 	//set global for the selected characters location
 	targetX = mapX;
 	targetY = mapY;
+	
+	GetValidTargets(targetX, targetY, selectedUnit->id, 1); //TODO: add range to character stats
+	
+	//initialize for attack targets
+	attackIndex = 0; 
 	//go to action state
 	NextState();
 }
@@ -289,7 +306,8 @@ void TentativeMove(){
 
 /* Calculate and Resolve Combat - finished, need to test */
 uint16_t defenderNewHP;
-uint16_t attackerNewHP; 
+uint16_t attackerNewHP;
+
 void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 	//damage done to each unit
 	uint16_t damage = units[attackerId].ATK;
@@ -413,13 +431,14 @@ void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
 	}
 }
 
+
 void ChangeAttackTarget(){
-	//generate a list of attackable enemies TODO: move this to run once when you enter charActionState
-	//cycle through list of attackable characters + option not to attack
-	uint16_t attackerId;
-	uint16_t defenderId;
+	//iterate through validTargets, preview results of combat
+	CalculateCombat(selectedUnit->id,validTargets[attackIndex]);
+	ShowCombatPreview(units[validTargets[attackIndex]].name, 	defenderNewHP, 	units[validTargets[attackIndex]].MHP,
+	selectedUnit->name, attackerNewHP, 	selectedUnit->MHP);
 	//reprint cursor/info screen
-	CalculateCombat(attackerId, defenderId);
+	
 }
 
 void SelectAttackTarget(){ //confirm the attack

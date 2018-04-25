@@ -27,12 +27,10 @@ void ShowStartupScreen(void);
 void ShowLoseScreen(void);
 void ShowWinScreen(void);
 
-void ShowMissionScreen(char** Missions, uint8_t numMissions);
-void ClearMissionCursor(uint8_t ypos);
-void PrintMissionCursor(uint8_t yPos);
-
 void ShowInfo(char* name, char id, uint16_t lvl,
 	uint16_t hp, uint16_t hpMax, uint16_t atk, uint16_t def,
 	uint16_t res, uint16_t spd);
+void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
+	char* attackName, uint16_t attackHP, uint16_t attackMHP);
 
 #endif /* __graphics_h */

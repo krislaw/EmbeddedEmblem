@@ -191,4 +191,24 @@ void ShowInfo(char* name, char id, uint16_t lvl,
 	
 	ST7735_SetTextColor(ST7735_WHITE);
 }
+	
+void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
+	char* attackName, uint16_t attackHP, uint16_t attackMHP){
+	
+	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
+	
+	ST7735_SetCursor(1, 1);
+	ST7735_OutString(attackName);
+	ST7735_OutString(" vs ");
+	ST7735_OutString(defendName);
+	ST7735_SetCursor(1, 2);
+	ST7735_OutUDec(attackHP);
+	ST7735_OutChar('/');
+	ST7735_OutUDec(attackMHP);
+	ST7735_OutString("   ");
+	ST7735_OutUDec(defendHP);
+	ST7735_OutChar('/');
+	ST7735_OutUDec(defendMHP);
+		
+}
 
