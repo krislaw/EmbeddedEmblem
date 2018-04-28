@@ -518,11 +518,11 @@ const struct Unit * previewUnit; //used for teambuild, use id 3 for graphics
 
 void BuildTeam(void){
 	currentState = &selectTeam;
+	PrintOnTeamBuild((uint16_t***) &proPortraits);
+	ShowTeamSelectCursor(buildTeamIndex);
 	previewUnit = &protagonists[0];
 	SetCharacterGraphics(3, (uint16_t *) proSpritesA[0], (uint16_t *) proSpritesB[0], (uint16_t *) proPortraits[0]);
-	ShowPreview(previewUnit->name, previewUnit->weapon, previewUnit->MHP,	previewUnit->ATK, previewUnit->DEF, previewUnit->RES,	previewUnit->SPD);
 }
-
 
 void TeambuildScroll(void){
 	HideTeamSelectCursor(buildOldIndex);
@@ -531,7 +531,8 @@ void TeambuildScroll(void){
 }
 
 void PreviewUnit(){
-	
+	ShowPreview(previewUnit->name, previewUnit->weapon, previewUnit->MHP,
+	previewUnit->ATK, previewUnit->DEF, previewUnit->RES,	previewUnit->SPD);
 }
 
 /*Game Init - sets some variables to prepare for gameplay*/
