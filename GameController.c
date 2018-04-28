@@ -21,8 +21,8 @@
 struct Unit units[8]; //[0, 1, 2] used for player characters, [3, ... 7] used for enemies
 
 //cursor positions for character select screen
-uint16_t buildTeamX;
-uint16_t buildTeamY;
+uint8_t buildTeamIndex;
+uint8_t buildOldIndex;
 
 /* ============== Map Registers ====================
 * Global Values used during fights each time a map is loaded up.
@@ -432,20 +432,20 @@ void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
 }
 
 
+/*Change Attack Target - to check */
 void ChangeAttackTarget(){
 	//iterate through validTargets, preview results of combat
-	CalculateCombat(selectedUnit->id,validTargets[attackIndex]);
-	ShowCombatPreview(units[validTargets[attackIndex]].name, 	defenderNewHP, 	units[validTargets[attackIndex]].MHP,
+	uint8_t TargetId = validTargets[attackIndex];
+	CalculateCombat(selectedUnit->id, TargetId);
+	ShowCombatPreview(units[TargetId].name, 	defenderNewHP, 	units[TargetId].MHP,
 	selectedUnit->name, attackerNewHP, 	selectedUnit->MHP);
-	//reprint cursor/info screen
-	
+	//TODO: reprint cursor	
 }
 
-void SelectAttackTarget(){ //confirm the attack
-	uint16_t attackerId;
-	uint16_t defenderId;
-	
-	ResolveCombat(attackerId, defenderId);
+/* Select Attack Target - */
+void SelectAttackTarget(){
+	//write back combat changes
+	ResolveCombat(selectedUnit->id, validTargets[attackIndex]);
 	//do combat animations??
 }
 
@@ -486,7 +486,7 @@ void GenerateTeam(void){
 	SetCharacterGraphics(3, (uint16_t *) &mmage1, (uint16_t *) &mmage1, (uint16_t *) &mmage1face);
 	SetCharacterGraphics(4, (uint16_t *) &massassin1, (uint16_t *) &massassin1, (uint16_t *) &massasin1face);
 	SetCharacterGraphics(5, (uint16_t *) &marmor1, (uint16_t *) &marmor1, (uint16_t *) &marmor1face);
-	
+
 	numCharacters = 6;
 }
 /* GenerateMap - hard coded map until map select is complete */
@@ -508,20 +508,21 @@ void GenerateMap(void) {
 	unitXLocations[5] = Xmax - 1; unitYLocations[5] = 3; unitsOnMap[Xmax - 1][3] = 5;
 }
 
- // TODO: Team Builder 
+// TODO: calibrate scroll location
+struct Unit previewUnit; //used for teambuild, use id 3 for graphics
+
 void TeambuildScroll(void){
-	//
+	HideTeamSelectCursor(buildOldIndex);
+	ShowTeamSelectCursor(buildTeamIndex);
+	
 }
 
 
+/* BuildTeam - add new units at beginning of game and if units die */
 void BuildTeam(void){
-	numCharacters = 0;
 	currentState = &selectTeam;
-	while(numCharacters < 3){
-		//show selection of characters
-		
-		//choose a chracter
-	}
+	previewUnit = protagonists[0];
+	SetCharacterGraphics(3, (uint16_t *) proSpritesA[0], (uint16_t *) proSpritesB[0], (uint16_t *) proPortraits[0]);
 }
 
 
@@ -531,17 +532,16 @@ void GameInit(){
 	//cursor initialization
 	mapX = 0;
 	mapY = 7;
-	buildTeamX = 0;
-	buildTeamY = 0;
+	buildTeamIndex = 0;
 	special = 0;
+	alive = 0;
 }
 
 /* Mission Init - clean registers and initialize mission */
 void MissionInit(uint8_t missionId){
 	mapX = 0;
 	mapY = 7;
-	buildTeamX = 0;
-	buildTeamY = 0;
+	buildTeamIndex = 0;
 	special = 0;
 	
 	for(int i = 0; i < 8; i++) {
@@ -593,41 +593,10 @@ void InfoScreenTest(){
 	}
 }
 
-/* ================= Run Game ===================
-* This is the main for all of our software in the game
-* It loops until you lose or beat the whole game
-*
-*/
-void RunGame(){
-	PlaySong();
-	
-	//TODO: Character Building... I'm thinking 1) desert, 2) valley, 3) temple, 4) ruin
-/*
-	BuildTeam();
-	for(int i = 0; i < numMissions; i++){
-		MissionInit(i);
-		RuinMission(); //if you lose, have to restart system, if you return here you won
-		LevelUp(alive&pcVector); //level up living characters
-		AddToTeam(alive&pcVector); //choose new level 1 if you died
-	}
+
+	/* ======== RUN FROM GAME'S MAIN WHILE LOOP ============
 	*/
-	
-	GenerateTeam();
-	GenerateMap();
-	
-	PrintMapAll();
-	ClearButtonPush(); //ignore buttons during initialization
-	
-	currentState = &scanMap;
-	/* ======== RUN GAME MAIN WHILE LOOP ============
-	* 
-	*
-	*/
-	
-	while(1){
-//		AnimateCharacters();
-//		SysTick_Wait10ms(500);
-		
+void RunStates() {
 		// A and B Buttons
 		int buttons = GetButtonPush();
 		if((buttons & 0x2) > 0) {
@@ -643,30 +612,66 @@ void RunGame(){
 		if( (dX | dY) != 0) {
 			UpdateCursor(dX, dY);
 			(*currentState->onScroll)();
-		}
-		
-		
-		switch(currentState->StateNum){
+		}	
+		//switch(currentState->StateNum){
 		//special things for special states
-			default: break;
+			//default: break;
+		//} //end switch
+}
+
+/* ================= Run Game ===================
+* This is the main for all of our software in the game
+* It loops until you lose or beat the whole game
+*
+*/
+
+void RunGame(){
+	PlaySong();
+	
+	//TODO: Character Building... I'm thinking 1) desert, 2) valley, 3) temple, 4) ruin
+
+/*
+	for(int i = 0; i = numMissions; i++){
+		//TODO: display story scene
+		BuildTeam();
+		while((alive & pcVector) < pcVector){
+			RunStates();
 		}
-		
+		MissionInit(i);
+		currentState = &scanMap;
+		while((special & 0x2) == 0){
+			RunStates();
+		}
+		//reach here if you won the mission
+		//SysTick_Wait10ms(); //let the win screen display for while
+		while(GetButtonPress == 0) { }
+		LevelUp(); //level up all units who lived
+	}
+	*/
+	
+	GenerateTeam();
+	GenerateMap();
+	
+	PrintMapAll();
+	ClearButtonPush(); //ignore buttons during initialization
+	
+	currentState = &scanMap;
+	while(1){
+		RunStates();
 	}
 }
 
 
 /* ==== Game Flow State Machine ====
 *	1st set of states: build team
-* 2nd set of states: select a map
-* 3rd set of states: play the map
+* 2nd set of states: play mission
+* 3rd set of states: ??
 * 4th set of states: ??? Bonus Features I guess
 */
 	
 const struct State selectTeam = {0, &NextState, &EmptyFunc, &TeambuildScroll };
 const struct State previewStats = {1, &NextState, &UndoState, &EmptyFunc };
 const struct State addToTeam = {2, &NextState, &EmptyFunc, &EmptyFunc };
-
-const struct State viewTutorial; //push B from the chooseMap screen, TODO: select map screen
 
 const struct State scanMap = {3, &ScanMapA, &EmptyFunc, &ScanMapScroll};
 const struct State charSelected = {4, &ApplyTentMove, &UndoState, &TentativeMove};

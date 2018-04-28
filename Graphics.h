@@ -33,4 +33,7 @@ void ShowInfo(char* name, char id, uint16_t lvl,
 void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 	char* attackName, uint16_t attackHP, uint16_t attackMHP);
 
+void HideTeamSelectCursor(uint8_t Index);
+void ShowTeamSelectCursor(uint8_t Index);
+
 #endif /* __graphics_h */

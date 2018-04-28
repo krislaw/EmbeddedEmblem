@@ -164,7 +164,7 @@ void ShowInfo(char* name, char id, uint16_t lvl,
 	else{ 					//hero
 		teamColor = ST7735_BLUE;
 	}
-		
+	
 	ST7735_FillRect(32, 0, 96, 31, ST7735_BLACK);
 	ST7735_FillRect(32, 31, 96, 1, teamColor);
 		
@@ -212,3 +212,36 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 		
 }
 
+//cursors for team building states
+const uint16_t selectX[8] = { 0, 0, 0, 0, 32, 32, 32, 32 };
+const uint16_t selectY[8] = { 0, 0, 32, 32, 64, 64, 96, 96 };
+	
+void HideTeamSelectCursor(uint8_t Index){
+	if(Index > 7) { return; }
+	ST7735_SetCursor(selectX[Index], selectY[Index]);
+	ST7735_OutChar(' ');
+}
+
+void ShowTeamSelectCursor(uint8_t Index){
+	if(Index > 7) { return; }
+	ST7735_SetCursor(selectX[Index], selectY[Index]);
+	ST7735_OutChar('^');
+}
+
+
+#define minTBX 0
+#define maxTBX 64
+#define deltaTBX 32
+#define minTBY 0
+#define maxTBY 128
+#define deltaTBY 36
+
+void PrintOnTeamBuild(uint16_t ** portraits[8]){
+	uint8_t x = 0;
+	for(uint16_t i = minTBX; i < maxTBX; i+= deltaTBX){
+		for(uint16_t j = minTBY; j < maxTBY; j+= deltaTBY) {
+			ST7735_DrawBitmap(i, j, portraits[0][x], 32, 32);
+			x++;
+		}
+	}
+}
