@@ -77,6 +77,11 @@ const struct State checkWin;
 const struct State waitForEnemy;
 const struct State checkLose;
 
+
+//declared functions for out-of-order organization
+void PrintMapAll(void);
+
+
 /* ======= GENERAL STATE MACHINE FUNCTIONS =============*
 * Undo State is to go back when a B button is pressed, not always applicable
 * Next State goes to the next state, should check that next state is valid BEFORE calling
@@ -103,9 +108,12 @@ uint16_t IdToVector(uint16_t id){ //id for indexes to vector for alive/moved reg
 
 void UndoState(){
 	//clear any between state flags
+	
 	switch(currentState->StateNum){
 		case 1: currentState = &previewStats; break;
-		case 4: currentState = &scanMap; break;
+		case 4: 
+			PrintMapAll();
+			currentState = &scanMap; break;
 		default:
 			break; //cannot go back
 	}
@@ -140,8 +148,14 @@ void NextState(){
 	}
 }
 
-void LevelUp(){
-	
+/*LevelUp - finished, test for balance*/
+void LevelUp(uint8_t i){
+		units[i].MHP += 2;
+		units[i].HP = units[i].MHP;
+		units[i].ATK += 3;
+		units[i].DEF += 2;
+		units[i].RES += 2;
+		units[i].SPD = (units[i].SPD * 2)/10;
 }
 
 /* checkLose state -  */
@@ -513,12 +527,12 @@ void GenerateMap(void) {
 }
 
 // TODO: calibrate scroll location
+
 const struct Unit * previewUnit; //used for teambuild, use id 3 for graphics
 /* BuildTeam - add new units at beginning of game and if units die */
-
 void BuildTeam(void){
 	currentState = &selectTeam;
-	PrintOnTeamBuild((uint16_t***) &proPortraits);
+	PrintOnTeamBuild((uint16_t ***) &proPortraits);
 	ShowTeamSelectCursor(buildTeamIndex);
 	previewUnit = &protagonists[0];
 	SetCharacterGraphics(3, (uint16_t *) proSpritesA[0], (uint16_t *) proSpritesB[0], (uint16_t *) proPortraits[0]);
@@ -533,6 +547,16 @@ void TeambuildScroll(void){
 void PreviewUnit(){
 	ShowPreview(previewUnit->name, previewUnit->weapon, previewUnit->MHP,
 	previewUnit->ATK, previewUnit->DEF, previewUnit->RES,	previewUnit->SPD);
+}
+
+
+void AddUnit(){
+	for(uint8_t i = 0; i < 3; i++){
+		if( (IdToVector(i)&alive) == 0){
+			units[i] = protagonists[buildTeamIndex];
+			SetCharacterGraphics(i, (uint16_t *) proSpritesA[buildTeamIndex], (uint16_t *) proSpritesB[buildTeamIndex],  (uint16_t *) proPortraits[buildTeamIndex]); //
+		}
+	}
 }
 
 /*Game Init - sets some variables to prepare for gameplay*/
@@ -654,10 +678,12 @@ void RunGame(){
 		//reach here if you won the mission
 		//SysTick_Wait10ms(); //let the win screen display for while
 		while(GetButtonPress == 0) { }
-		LevelUp(); //level up all units who lived
+		LevelUp(0); //level up all units who lived
+		LevelUp(1);
+		LevelUp(2);
 	}
-	*/
 	
+	*/
 	GenerateTeam();
 	GenerateMap();
 	
@@ -670,12 +696,10 @@ void RunGame(){
 	}
 }
 
-
 /* ==== Game Flow State Machine ====
 *	1st set of states: build team
 * 2nd set of states: play mission
 * 3rd set of states: ??
-* 4th set of states: ??? Bonus Features I guess
 */
 	
 const struct State selectTeam = {0, &PreviewUnit, &EmptyFunc, &TeambuildScroll };

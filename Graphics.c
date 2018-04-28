@@ -241,7 +241,10 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 //cursors for team building states
 const uint16_t selectX[8] = { 0, 0, 0, 0, 32, 32, 32, 32 };
 const uint16_t selectY[8] = { 0, 0, 32, 32, 64, 64, 96, 96 };
-	
+
+//height 128
+//width 64 with all
+
 void HideTeamSelectCursor(uint8_t Index){
 	if(Index > 7) { return; }
 	ST7735_SetCursor(selectX[Index], selectY[Index]);
@@ -264,6 +267,8 @@ void ShowTeamSelectCursor(uint8_t Index){
 
 void PrintOnTeamBuild(uint16_t ** portraits[8]){
 	Output_Clear();
+	ST7735_SetCursor(4,0);
+	ST7735_OutString("Select Your Character:");
 	uint8_t x = 0;
 	for(uint16_t i = minTBX; i < maxTBX; i+= deltaTBX){
 		for(uint16_t j = minTBY; j < maxTBY; j+= deltaTBY) {
