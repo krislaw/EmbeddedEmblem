@@ -189,7 +189,33 @@ void ShowInfo(char* name, char id, uint16_t lvl,
 	ST7735_OutString(" SPD:");
 	StatOut(spd);
 	
-	ST7735_SetTextColor(ST7735_WHITE);
+	//ST7735_SetTextColor(ST7735_WHITE);
+}
+	
+char * weaponString[] = {	"Sword", "Lance", "Axe", "DragonStone", "Tome", "Staff", "Armor"};
+
+void ShowPreview(char* name, uint8_t weapon, uint16_t hpMax,
+uint16_t atk, uint16_t def, uint16_t res, uint16_t spd){
+	Output_Clear();
+	ST7735_DrawBitmap(48, 12, charPortraits[3], 32, 32);
+	ST7735_SetCursor(5, 4); //middleish of screen
+	ST7735_OutString(name);
+	ST7735_SetCursor(5, 5);
+	ST7735_OutString((char*) weaponString[weapon]);
+	ST7735_SetCursor(5, 6);
+	ST7735_OutString("Hit Points: ");
+	StatOut(hpMax);
+	ST7735_SetCursor(3, 7);
+	ST7735_OutString("ATK:");
+	StatOut(atk);
+	ST7735_OutString(" DEF:");
+	StatOut(def);
+	ST7735_SetCursor(8, 7);
+	ST7735_OutString("RES:");
+	StatOut(res);
+	ST7735_OutString(" SPD:");
+	StatOut(spd);
+		
 }
 	
 void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
@@ -237,6 +263,7 @@ void ShowTeamSelectCursor(uint8_t Index){
 #define deltaTBY 36
 
 void PrintOnTeamBuild(uint16_t ** portraits[8]){
+	Output_Clear();
 	uint8_t x = 0;
 	for(uint16_t i = minTBX; i < maxTBX; i+= deltaTBX){
 		for(uint16_t j = minTBY; j < maxTBY; j+= deltaTBY) {

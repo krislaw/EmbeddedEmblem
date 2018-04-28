@@ -140,6 +140,10 @@ void NextState(){
 	}
 }
 
+void LevelUp(){
+	
+}
+
 /* checkLose state -  */
 void CheckLose(){
 	if((alive & pcVector) == 0){
@@ -509,22 +513,26 @@ void GenerateMap(void) {
 }
 
 // TODO: calibrate scroll location
-struct Unit previewUnit; //used for teambuild, use id 3 for graphics
+const struct Unit * previewUnit; //used for teambuild, use id 3 for graphics
+/* BuildTeam - add new units at beginning of game and if units die */
+
+void BuildTeam(void){
+	currentState = &selectTeam;
+	previewUnit = &protagonists[0];
+	SetCharacterGraphics(3, (uint16_t *) proSpritesA[0], (uint16_t *) proSpritesB[0], (uint16_t *) proPortraits[0]);
+	ShowPreview(previewUnit->name, previewUnit->weapon, previewUnit->MHP,	previewUnit->ATK, previewUnit->DEF, previewUnit->RES,	previewUnit->SPD);
+}
+
 
 void TeambuildScroll(void){
 	HideTeamSelectCursor(buildOldIndex);
 	ShowTeamSelectCursor(buildTeamIndex);
+	SetCharacterGraphics(3, (uint16_t *) proSpritesA[buildTeamIndex], (uint16_t *) proSpritesB[buildTeamIndex], (uint16_t *) proPortraits[buildTeamIndex]);
+}
+
+void PreviewUnit(){
 	
 }
-
-
-/* BuildTeam - add new units at beginning of game and if units die */
-void BuildTeam(void){
-	currentState = &selectTeam;
-	previewUnit = protagonists[0];
-	SetCharacterGraphics(3, (uint16_t *) proSpritesA[0], (uint16_t *) proSpritesB[0], (uint16_t *) proPortraits[0]);
-}
-
 
 /*Game Init - sets some variables to prepare for gameplay*/
 void GameInit(){
@@ -669,7 +677,7 @@ void RunGame(){
 * 4th set of states: ??? Bonus Features I guess
 */
 	
-const struct State selectTeam = {0, &NextState, &EmptyFunc, &TeambuildScroll };
+const struct State selectTeam = {0, &PreviewUnit, &EmptyFunc, &TeambuildScroll };
 const struct State previewStats = {1, &NextState, &UndoState, &EmptyFunc };
 const struct State addToTeam = {2, &NextState, &EmptyFunc, &EmptyFunc };
 
