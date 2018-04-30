@@ -91,7 +91,7 @@ void PrintSprite(uint8_t id, uint8_t x, uint8_t y){ //which sprite to print and 
 	}
 }
 
-void AnimeSprite(){ //alternate the graphics so next print sprite looks animated
+void AnimateSprite(){ //alternate the graphics so next print sprite looks animated
 	animate ^= 0x01;
 	switch(animate){
 		case 0: charSprites = charSpritesA;
@@ -153,6 +153,7 @@ void StatOut(uint16_t stat){
 	else { ST7735_OutChar(' '); }
 	ST7735_OutChar(stat % 10 + '0');
 }
+
 
 void ShowInfo(char* name, char id, uint16_t lvl,
 	uint16_t hp, uint16_t hpMax, uint16_t atk, uint16_t def,
@@ -235,12 +236,15 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 	ST7735_OutUDec(defendHP);
 	ST7735_OutChar('/');
 	ST7735_OutUDec(defendMHP);
-		
+	if(attackHP == 0){
+		ST7735_SetCursor(1, 3);
+		ST7735_OutString("WARNING: Fatal Combat");
+	}	
 }
 
 //cursors for team building states
-const uint16_t selectX[8] = { 0, 0, 0, 0, 32, 32, 32, 32 };
-const uint16_t selectY[8] = { 0, 0, 32, 32, 64, 64, 96, 96 };
+const uint16_t selectX[8] = { 0, 0, 0, 0, 6, 6, 6, 6 };
+const uint16_t selectY[8] = { 0, 4, 8, 12, 0, 4, 8, 12 };
 
 //height 128
 //width 64 with all

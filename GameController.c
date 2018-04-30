@@ -421,7 +421,6 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 		else{ defenderNewHP-=damage;
 			if(recoil > attackerNewHP){
 				attackerNewHP = 0;
-				//TODO: print warning that the unit will die
 			}
 			else{
 				attackerNewHP-=recoil;
