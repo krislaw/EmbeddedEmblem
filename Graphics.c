@@ -244,10 +244,10 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 
 
 const char* story[] = {
-	"Chapter 1: Desert\n\nEnemy forces gather in the\n desert to the west.\nYour team is deployed\nto stop them.\n\nRoute the Enemy.", 
-	"Chapter 2: Valley\n\nWith the enemy defeated,\n you think yourself safe.\nAlong you path home, an\n ambus strikes!\n\nDefend yourself!",
-	"Chapter 3: Temple\n\nYou learn a greater force\nis on it's way to the\nto the capital.\n You have to stop it!\n\nRoute the Enemy.",
-	"Chapter 4: Ruin\n\nIn your victory, the\n earth begins to quake\nand a chasm opens.\n You have once change to...\n\n    Defeat Evil."
+	"Chapter 1: Desert\n\nEnemy forces gather\nin the desert\nto the west.\nYour team is\ndeployed\nto stop them.\n\nRoute the Enemy.", 
+	"Chapter 2: Valley\n\nWith the enemy\ndefeated, you\nthink yourself safe.\nAlong you path home,\nsn ambus strikes!\n\nDefend yourself!",
+	"Chapter 3: Temple\n\nYou learn a\ngreater force\nis on it's way to\nthe to the castle.\n You have to stop it!\n\nRoute the Enemy.",
+	"Chapter 4: Ruin\n\nThe ground shakes,\n the sky cracks,\nand a chasm opens\nin the earth.\nOne final battle...\n\n    Defeat Evil."
 };
 
 void ShowStory(uint8_t chapter){
@@ -257,7 +257,7 @@ void ShowStory(uint8_t chapter){
 	ST7735_OutString((char*) story[chapter]);
 }
 
-
+ 
 //cursors for team building states
 const uint16_t selectX[8] = { 0, 0, 0, 0, 6, 6, 6, 6 };
 const uint16_t selectY[8] = { 0, 4, 8, 12, 0, 4, 8, 12 };
