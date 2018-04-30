@@ -12,6 +12,7 @@
 #include "Input.h"
 #include "CharActions.h"
 
+#define numMissions 4
 #define pcVector 0x07
 #define npcVector 0xF1
 
@@ -659,12 +660,11 @@ void RunStates() {
 
 void RunGame(){
 	PlaySong();
-	
-	//TODO: Character Building... I'm thinking 1) desert, 2) valley, 3) temple, 4) ruin
 
-/*
-	for(int i = 0; i = numMissions; i++){
-		//TODO: display story scene
+	for(int i = 0; i < numMissions; i++){
+		ShowStory(i);
+		//SysTick_Wait10ms(200); //let you read story for awhile
+		while(GetButtonPush() == 0);
 		BuildTeam();
 		while((alive & pcVector) < pcVector){
 			RunStates();
@@ -675,14 +675,13 @@ void RunGame(){
 			RunStates();
 		}
 		//reach here if you won the mission
-		//SysTick_Wait10ms(); //let the win screen display for while
-		while(GetButtonPress == 0) { }
+		//SysTick_Wait10ms(200); //let the win screen display for while
+		while(GetButtonPush() == 0) { }
 		LevelUp(0); //level up all units who lived
 		LevelUp(1);
 		LevelUp(2);
 	}
-	
-	*/
+
 	GenerateTeam();
 	GenerateMap();
 	

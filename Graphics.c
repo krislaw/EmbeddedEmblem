@@ -193,7 +193,7 @@ void ShowInfo(char* name, char id, uint16_t lvl,
 	//ST7735_SetTextColor(ST7735_WHITE);
 }
 	
-char * weaponString[] = {	"Sword", "Lance", "Axe", "DragonStone", "Tome", "Staff", "Armor"};
+char * weaponString[] = {	"Sword", "Lance", "Axe", "Dragon", "Tome", "Staff", "Armor"};
 
 void ShowPreview(char* name, uint8_t weapon, uint16_t hpMax,
 uint16_t atk, uint16_t def, uint16_t res, uint16_t spd){
@@ -241,6 +241,22 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 		ST7735_OutString("WARNING: Fatal Combat");
 	}	
 }
+
+
+const char* story[] = {
+	"Chapter 1: Desert\n\nEnemy forces gather in the\n desert to the west.\nYour team is deployed\nto stop them.\n\nRoute the Enemy.", 
+	"Chapter 2: Valley\n\nWith the enemy defeated,\n you think yourself safe.\nAlong you path home, an\n ambus strikes!\n\nDefend yourself!",
+	"Chapter 3: Temple\n\nYou learn a greater force\nis on it's way to the\nto the capital.\n You have to stop it!\n\nRoute the Enemy.",
+	"Chapter 4: Ruin\n\nIn your victory, the\n earth begins to quake\nand a chasm opens.\n You have once change to...\n\n    Defeat Evil."
+};
+
+void ShowStory(uint8_t chapter){
+	if(chapter > 3) { return; }
+	Output_Clear();
+	ST7735_SetCursor(0, 0);
+	ST7735_OutString((char*) story[chapter]);
+}
+
 
 //cursors for team building states
 const uint16_t selectX[8] = { 0, 0, 0, 0, 6, 6, 6, 6 };
