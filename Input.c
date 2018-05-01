@@ -7,7 +7,6 @@ Controls all buttons and Joystick Logic
 #include "inc/tm4c123gh6pm.h"
 #include "Input.h"
 #include "Timer3A.h" //ADC sampling
-#include "Timer0B.h" //Button Debouncing
 
 //Control Pad on PE 1, 2, 3, 5
 #define upB 0x02
@@ -53,7 +52,7 @@ void ButtonInit(){ //AB: PF3, PF4
   NVIC_EN0_R = 0x40000000; // enable interrupt 4 in NVIC
 	AB = 0;
 		
-	Timer0B_Init(ButtonEnable, ABperiod);
+	//Timer0B_Init(ButtonEnable, ABperiod);
 }
 
 void GPIOPortF_Handler(void){
@@ -64,7 +63,7 @@ void GPIOPortF_Handler(void){
     AB |= 2;                  // signal SW2 occurred
   }
 	ButtonDisable();
-	Timer0B_Enable();
+	//Timer0B_Enable();
 }
 
 uint8_t GetButtonPush(void){
