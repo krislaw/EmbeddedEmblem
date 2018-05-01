@@ -597,6 +597,15 @@ void PrintMapAll(){
 
 
 
+void EnemyMove(){
+	uint8_t enemyId = MoveEnemy();
+	GetValidTargets(unitXLocations[enemyId], unitYLocations[enemyId], enemyId, 1);
+	if(validTargets[0]!=END_SENTINAL){
+		CalculateCombat(enemyId, validTargets[0]);
+		ResolveCombat(enemyId, validTargets[0]);
+	}
+}
+
 /* =========== END MAP FUNCTIONS =============*/
 
 /* ======= FUNCTIONS FOR TEAMBUILDER =============*
