@@ -3,7 +3,7 @@
 
 //used for CharActions
 extern int16_t unitsOnMap[8][8];
-extern const uint8_t (*tilesOnMap)[8][8];
+extern const uint8_t *tilesOnMap;
 	
 void GameInit(void);
 

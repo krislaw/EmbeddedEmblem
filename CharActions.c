@@ -7,7 +7,7 @@ uint8_t validMoves[2][maxMoves + 1];
 uint8_t validTargets[maxTargets + 1];
 uint16_t numMoves;
 
-void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt){
+void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt, uint8_t id){
 	if(moveAmt > 3) { return; } //moveAmt must be 0, 1, 2 
 	int16_t xmin = x;
 	int16_t xmax = x + 1;
@@ -17,7 +17,7 @@ void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt){
 	for(int16_t i = (y - moveAmt); i < (y + moveAmt + 1); i++){
 		for(int16_t j = xmin; j < xmax; j++){
 			if(i > 0 && i < 8 && j > -1 && j < 8){
-				if(tilesOnMap[0][j][i] < 2 && unitsOnMap[j][i]== -1){
+				if((char) tilesOnMap[(i*8) + j] < 2 && (unitsOnMap[j][i] == -1 || unitsOnMap[j][i] == id)){
 					validMoves[0][numMoves] = j;
 					validMoves[1][numMoves] = i;
 					numMoves++;
@@ -64,7 +64,6 @@ void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range){ /
 		if(dflag){ xmin++; xmax--; }
 		else{ xmax++; xmin--; }
 	}
-	
 	validTargets[numTargets] = END_SENTINAL;
 	
 }

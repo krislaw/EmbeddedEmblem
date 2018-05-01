@@ -2,8 +2,6 @@
 #include "inc/ST7735.h"
 
 #include "HardCoded.h"
-//#include "Sprites.h"
-//#include "Portraits.h"
 
 const uint16_t * currentMap;
 uint16_t ** charSprites;
@@ -76,7 +74,6 @@ void PrintTile(uint8_t x, uint8_t y){ //print a map tile
 #define BgColor 0x4D84
 
 void PrintSprite(uint8_t id, uint8_t x, uint8_t y){ //which sprite to print and where 
-
 	uint16_t xs = (x * 16);
 	uint16_t ys = (y * 16) + SpriteYOffset;
 	
@@ -154,6 +151,17 @@ void StatOut(uint16_t stat){
 	ST7735_OutChar(stat % 10 + '0');
 }
 
+void ShowNonCombat(){
+	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
+	ST7735_SetCursor(1, 1);
+	ST7735_OutString("Press A to Confirm\n      Movement");	
+}
+
+void ShowWaitForServer(){
+	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
+	ST7735_SetCursor(1, 1);
+	ST7735_OutString("Waiting for Enemy...");	
+}
 
 void ShowInfo(char* name, char id, uint16_t lvl,
 	uint16_t hp, uint16_t hpMax, uint16_t atk, uint16_t def,
@@ -285,7 +293,7 @@ void ShowTeamSelectCursor(uint8_t Index){
 #define maxTBY 153
 #define deltaTBY 36
 
-void PrintOnTeamBuild(uint16_t * portraits[8]){
+void PrintOnTeamBuild(const uint16_t * portraits[8]){
 	Output_Clear();
 	ST7735_SetCursor(2,0);
 	ST7735_OutString("Choose Your Team:");

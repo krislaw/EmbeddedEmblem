@@ -19,8 +19,8 @@ Controls all buttons and Joystick Logic
 //AB on PF 4, 0
 #define Abut 0x10
 #define Bbut 0x01
+uint8_t ABmid; //debouncing
 uint8_t AB;
-uint8_t newButton; //debouncing mask
 #define ABperiod 1000000
 
 //Joystick on PE 1, 2
@@ -57,24 +57,21 @@ void ButtonInit(){ //AB: PF3, PF4
 	NVIC_PRI7_R= (NVIC_PRI7_R& ~0xE0000)|0x00600000; // Port F, bits 23-21 current at priority 3
   NVIC_EN0_R = 0x40000000; // enable interrupt 4 in NVIC
 	AB = 0;
+	ABmid = 0;
 //	Timer0B_Init(ButtonEnable, ABperiod);
 }
 
 void GPIOPortF_Handler(void){
   if((GPIO_PORTF_RIS_R & Abut) > 0){  // poll PF4
-    AB |= (1 & newButton);                  // signal SW1 occurred
+    ABmid |= 1;                  // signal SW1 occurred
   }
   if((GPIO_PORTF_RIS_R & Bbut) > 0){  // poll PF0 
-    AB |= (2 & newButton);                  // signal SW2 occurred
+    ABmid |= 2;                  // signal SW2 occurred
   }
-	newButton = 0;
 	GPIO_PORTF_ICR_R = (Abut | Bbut);  	// acknowledge flag5
-	//ButtonDisable();
-	//Timer0B_Enable();
 }
 
 uint8_t GetButtonPush(void){
-//	SysTick_Wait10ms(10); 
 	uint8_t ret = AB;
 	AB = 0; //clear vector when button is read
 	return ret;
@@ -82,6 +79,7 @@ uint8_t GetButtonPush(void){
 
 void ClearButtonPush(void){
 	AB = 0; //clear vector when button is read
+	ABmid = 0;
 }
 
 
@@ -109,8 +107,9 @@ void ADC_In23(){
   Yraw = ADC0_SSFIFO2_R&0xFFF;  // 3A) read first result
   Xraw = ADC0_SSFIFO2_R&0xFFF;  // 3B) read second result
   ADC0_ISC_R = 0x0004;             // 4) acknowledge completion
-		
-	newButton = 3;
+	
+	AB = ABmid; //debouncing
+	ABmid = 0;
 }
 
 

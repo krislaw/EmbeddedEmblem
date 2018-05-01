@@ -1,5 +1,7 @@
 #include <stdint.h>
 #include <stdbool.h>
+#include <stdlib.h>
+
 #include "inc/SysTick.h"
 #include "inc/tm4c123gh6pm.h"
 #include "GameController.h"
@@ -31,7 +33,7 @@ uint8_t buildOldIndex;
 uint8_t unitXLocations[8]; 	//index is character id number
 uint8_t unitYLocations[8]; 	//index is character id number
 int16_t unitsOnMap[8][8]; 	//-1 indicates empty, else id number of character in that space
-const uint8_t (*tilesOnMap)[8][8];		//8x8 array describing the terrain
+const uint8_t (*tilesOnMap);		//8x8 array describing the terrain
 uint8_t numCharacters; 			//number of characters on the current map, max 8
 uint8_t alive; 							//npc + pc vector
 uint8_t moved; 							//npc + pc vector
@@ -81,6 +83,7 @@ const struct State checkLose;
 
 //declared functions for out-of-order organization
 void PrintMapAll(void);
+void ScanMapA(void);
 
 
 /* ======= GENERAL STATE MACHINE FUNCTIONS =============*
@@ -112,27 +115,37 @@ void UndoState(){
 	switch(currentState->StateNum){
 		case 1:
 			currentState = &selectTeam;
-			PrintOnTeamBuild((uint16_t**) proPortraits);
+			PrintOnTeamBuild((const uint16_t**) proPortraits);
 			ShowTeamSelectCursor(buildTeamIndex);
 			break;
 		case 4: 
-			PrintMapAll();
-			currentState = &scanMap; break;
+			currentState = &scanMap;
+			PrintMapAll(); break;
+		case 5:
+			mapX = unitXLocations[selectedUnit->id];
+			mapY = unitYLocations[selectedUnit->id];
+			currentState = &charSelected;
+			PrintMapAll(); break;
 		default:
-			break; //cannot go back
+			break;
 	}
 }
+
 
 void NextState(){
 //	currentState = currentState->nextState;
 		switch(currentState->StateNum){
-			case 0: currentState = &previewStats; break;
+			case 0:
+				currentState = &previewStats; break;
 			case 1:
 				currentState = &addToTeam;
 				break;
 			case 2:
 				currentState = &selectTeam;
-				PrintOnTeamBuild((uint16_t**) proPortraits);
+				if((alive & pcVector) != pcVector){
+					PrintOnTeamBuild((const uint16_t**) proPortraits);
+					ShowTeamSelectCursor(buildTeamIndex);
+				}
 				break;
 			case 3: currentState = &charSelected; break;
 			case 4: currentState = &charActionState; break;
@@ -140,20 +153,26 @@ void NextState(){
 			case 6:
 				if((moved & pcVector) == 0) { //all characters have moved
 					currentState = &waitForEnemy;
+					PrintMapAll();
+					ShowWaitForServer();
 				}
 				else{
 					currentState = &scanMap;
+					PrintMapAll();
 				}
 				break;
 			case 7: currentState = &checkLose; break;
-			case 8: currentState = &scanMap; break;
-			
+			case 8:
+				currentState = &scanMap;
+				moved = alive & pcVector;
+				break;
 			case 9: break;
 			case 10: break;
 			case 11: break;
 		default:
 			break; //cannot go back
 	}
+	ClearButtonPush(); //in case of lag
 }
 
 /*LevelUp - finished, test for balance*/
@@ -246,6 +265,16 @@ void UpdateCursor(int8_t dX, int8_t dY){
 			if(CheckInValidMoves(mapX + dX, mapY + dY)){ //should contain no out of bounds movement
 				mapX = mapX + dX;
 				mapY = mapY + dY;
+				break;
+			}
+			else if(CheckInValidMoves(mapX + 2*dX, mapY + dY)){ //should contain no out of bounds movement
+				mapX = mapX + 2*dX;
+				mapY = mapY + dY;
+				break;
+			}
+			else if(CheckInValidMoves(mapX + dX, mapY + 2*dY)){ //should contain no out of bounds movement
+				mapX = mapX + dX;
+				mapY = mapY + 2*dY;
 			}
 			break;
 		case 5: //charActionState - iterate through list of enemies
@@ -273,12 +302,15 @@ void ScanMapA(){
 	//select a char
 	if((unitsOnMap[mapX][mapY] > -1) && (unitsOnMap[mapX][mapY] < 3)){
 		selectedUnit = &units[unitsOnMap[mapX][mapY]];
+		if((IdToVector(selectedUnit->id) & moved) == 0){
+			return; //character has already moved this turn
+		}
 	}
 	else{ //not a valid character
 		return; 
 	}
 	//generate movement grid on global: validMoves
-	GetValidMoves(mapX, mapY, units[unitsOnMap[mapX][mapY]].MOV);
+	GetValidMoves(mapX, mapY, selectedUnit->MOV, selectedUnit->id);
 	int16_t i = 0;
 	while(validMoves[0][i] != END_SENTINAL){
 		PrintMoveTile(validMoves[0][i], validMoves[1][i]);
@@ -295,8 +327,11 @@ void ScanMapScroll(){
 	if(unitsOnMap[mapOldX][mapOldY] > -1){
 		PrintSprite(unitsOnMap[mapOldX][mapOldY], mapOldX, mapOldY);
 	}
-	if((mapOldY < 7) && (unitsOnMap[mapOldX][mapOldY + 1] > (-1))){
-		PrintSprite(unitsOnMap[mapOldX][mapOldY + 1], mapOldX, mapOldY + 1);
+	int i = 1;
+	while(unitsOnMap[mapOldX][mapOldY + i] > -1){
+		PrintSprite(unitsOnMap[mapOldX][mapOldY + i], mapOldX, mapOldY + i);
+		i++;
+		if((mapOldY + i) > 7) { break; }
 	}
 	//print cursor
 	PrintCursor(mapX, mapY);
@@ -313,9 +348,9 @@ void ApplyTentMove(){
 	targetY = mapY;
 	
 	GetValidTargets(targetX, targetY, selectedUnit->id, 1); //TODO: add range to character stats
-	
 	//initialize for attack targets
-	attackIndex = 0; 
+	attackIndex = 0;
+	ShowNonCombat();
 	//go to action state
 	NextState();
 }
@@ -327,10 +362,23 @@ void TentativeMove(){
 	PrintTile(mapOldX, mapOldY);
 	PrintMoveTile(mapOldX, mapOldY);
 	//reprint people if you stood behind them
-	if(unitsOnMap[mapOldX][mapOldY + 1] != -1) {
-		PrintSprite(unitsOnMap[mapOldX][mapOldY], mapOldX, mapOldY + 1);
+	if(unitsOnMap[mapOldX][mapOldY] > -1){
+		PrintSprite(unitsOnMap[mapOldX][mapOldY], mapOldX, mapOldY);
 	}
-	
+	int i = 1;
+	while(unitsOnMap[mapOldX][mapOldY + i] > -1){
+		PrintSprite(unitsOnMap[mapOldX][mapOldY + i], mapOldX, mapOldY + i);
+		i++;
+		if((mapOldY + i) > 7) { break; }
+	}
+	//reprint squares you stood in front of
+	PrintTile(mapOldX, mapOldY - 1);
+	if(CheckInValidMoves(mapOldX, mapOldY - 1)){
+		PrintMoveTile(mapOldX, mapOldY - 1);
+	}
+	if(unitsOnMap[mapOldX][mapOldY - 1] > -1){
+		PrintSprite(unitsOnMap[mapOldX][mapOldY - 1], mapOldX, mapOldY -1);
+	}	
 	PrintCursor(mapX, mapY);
 	PrintSprite(selectedUnit->id, mapX, mapY);
 }
@@ -467,30 +515,52 @@ void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
 /*Change Attack Target - to check */
 void ChangeAttackTarget(){
 	//iterate through validTargets, preview results of combat
-	uint8_t TargetId = validTargets[attackIndex];
-	CalculateCombat(selectedUnit->id, TargetId);
-	ShowCombatPreview(units[TargetId].name, 	defenderNewHP, 	units[TargetId].MHP,
-	selectedUnit->name, attackerNewHP, 	selectedUnit->MHP);
+	if(validTargets[attackIndex] == END_SENTINAL) {
+		ShowNonCombat();
+	}
+	else{
+		uint8_t TargetId = validTargets[attackIndex];
+		CalculateCombat(selectedUnit->id, TargetId);
+		ShowCombatPreview(units[TargetId].name, 	defenderNewHP, 	units[TargetId].MHP,
+		selectedUnit->name, attackerNewHP, 	selectedUnit->MHP);
 	//TODO: reprint cursor	
+	}
 }
 
 /* Select Attack Target - */
 void SelectAttackTarget(){
 	//write back combat changes
-	ResolveCombat(selectedUnit->id, validTargets[attackIndex]);
+	if(validTargets[attackIndex] != END_SENTINAL){
+		ResolveCombat(selectedUnit->id, validTargets[attackIndex]);
+	}
 	//do combat animations??
+	
+	//update unit's location in global, can't undo
+	moved &= ~(IdToVector(selectedUnit->id));
+	unitsOnMap[mapX][mapY] = selectedUnit->id;
+	unitsOnMap[unitXLocations[selectedUnit->id]][unitYLocations[selectedUnit->id]] = -1; 
+	unitXLocations[selectedUnit->id] = mapX;
+	unitYLocations[selectedUnit->id] = mapY;
+	NextState();
 }
 
 void PrintMapAll(){
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
 			PrintTile(i, j);
+			if(unitsOnMap[i][j] > -1){ //print units
+				PrintSprite(unitsOnMap[i][j], unitXLocations[unitsOnMap[i][j]], unitYLocations[unitsOnMap[i][j]]);
+			}
 		}
 	}
-	for(int i = 0; i < numCharacters; i++){
-		PrintSprite(units[i].id, unitXLocations[i], unitYLocations[i]);
-	}
 	UpdateInfoScreen(3);
+		if(currentState->StateNum == 4){ //move grid
+			uint16_t i = 0;
+			while(validMoves[0][i] != END_SENTINAL){
+				PrintMoveTile(validMoves[0][i], validMoves[1][i]);
+				i++;
+		}
+	}
 	PrintCursor(mapX, mapY);
 }
 
@@ -525,7 +595,7 @@ void GenerateTeam(void){
 /* GenerateMap - hard coded map until map select is complete */
 void GenerateMap(void) { 
 	SetMap((const uint16_t *) &templeMap);
-	tilesOnMap = &templeArray; 
+	tilesOnMap = (const uint8_t *) &templeArray; 
 	
 	for(int i = 0; i < 8; i++) {
 		for(int j = 0; j < 8; j++){
@@ -545,7 +615,7 @@ void GenerateMap(void) {
 const struct Unit * previewUnit; //used for teambuild, use id 3 for graphics
 void BuildTeam(void){
 	currentState = &selectTeam;
-	PrintOnTeamBuild((uint16_t**) proPortraits);//
+	PrintOnTeamBuild((const uint16_t**) proPortraits);//
 	ShowTeamSelectCursor(buildTeamIndex);
 	previewUnit = &protagonists[0];
 	SetCharacterGraphics(3, (uint16_t *) proSpritesA[0], (uint16_t *) proSpritesB[0], (uint16_t *) proPortraits[0]);
@@ -572,6 +642,7 @@ void AddUnit(){
 	for(uint8_t i = 0; i < 3; i++){
 		if( (IdToVector(i)&alive) == 0){
 			units[i] = protagonists[buildTeamIndex];
+			units[i].id = i;
 			SetCharacterGraphics(i, (uint16_t *) proSpritesA[buildTeamIndex], (uint16_t *) proSpritesB[buildTeamIndex],  (uint16_t *) proPortraits[buildTeamIndex]); //
 			alive |= IdToVector(i);
 			i = 3; 
@@ -608,36 +679,49 @@ void MissionInit(uint8_t missionId){
 	switch(missionId){ //tried hard not to hardcode this but pointer types conflict too much
 		case 1:
 			SetMap((const uint16_t*) &valleyMap);
-			tilesOnMap = &valleyArray;
+			tilesOnMap = (const uint8_t *) &valleyArray;
 			numCharacters = 6;
 			startLocation = (uint8_t *) &valleyStart;
 			break;
 		case 2:
 			SetMap((const uint16_t*) &templeMap);
-			tilesOnMap = &templeArray;
+			tilesOnMap = (const uint8_t *) &templeArray;
 			numCharacters = 6;
 			startLocation = (uint8_t *) &templeStart;
 			break;
 		case 3:
 			SetMap((const uint16_t*) (uint8_t *) &ruinMap);
-			tilesOnMap = &ruinArray;
+			tilesOnMap = (const uint8_t *) &ruinArray;
 			numCharacters = 6;
 			startLocation = (uint8_t *) &ruinStart;
 			break;
 		default:
 			SetMap((const uint16_t*) &desertMap);
-			tilesOnMap = &desertArray;
+			tilesOnMap = (const uint8_t *) &desertArray;
 			numCharacters = 6;
 			startLocation = (uint8_t *) &desertStart;
 			break;
 	}
+	
+	for(int i = 3; i < numCharacters; i++){
+		uint8_t indx = rand() % 6;
+		units[i] = villains[indx];
+		units[i].id = i;
+		SetCharacterGraphics(i, (uint16_t *) vilSpritesA[indx], (uint16_t *) vilSpritesB[indx], (uint16_t *) vilPortraits[indx]);
+		units[i].name = (char*) villainNames[(rand() % 30) * 6];
+	}
+	
 	for(int i = 0; i < numCharacters; i++){
-		unitXLocations[i] = startLocation[i];
-		unitYLocations[i] = startLocation[i + numCharacters]; //DEBUG: ensure that we are parsing 2D correctly
+		unitXLocations[i] = startLocation[i * 2];
+		unitYLocations[i] = startLocation[(i * 2) + 1];
 		unitsOnMap[unitXLocations[i]][unitYLocations[i]] = i;
 		alive |= (1 << i);
 	}
+	moved = pcVector; //mark all units not moved
+	currentState = &scanMap;
+	PrintMapAll();
 }
+
 void InfoScreenTest(){
 	GenerateTeam();
 	int i = 0;
@@ -667,10 +751,19 @@ void RunStates() {
 			UpdateCursor(dX, dY);
 			(*currentState->onScroll)();
 		}	
-		//switch(currentState->StateNum){
+		switch(currentState->StateNum){
 		//special things for special states
-			//default: break;
-		//} //end switch
+			case 6: //CheckWin
+				CheckWin();
+				break;
+			case 7: //Wait For Enemy
+				while(1) { } //i'm in debug
+				break;
+			case 8: //Check Lose
+				CheckLose();
+				break;
+			default: break;
+		} //end switch
 }
 
 /* ================= Run Game ===================
@@ -683,15 +776,14 @@ void RunGame(){
 	PlaySong();
 
 	for(int i = 0; i < numMissions; i++){
-		ShowStory(i);
-		//SysTick_Wait10ms(200); //let you read story for awhile
-		while(GetButtonPush() == 0);
 		BuildTeam();
 		while((alive & pcVector) < pcVector){
 			RunStates();
 		}
+		ShowStory(i);
+		//SysTick_Wait10ms(200); //let you read story for awhile
+		while(GetButtonPush() == 0);
 		MissionInit(i);
-		currentState = &scanMap;
 		while((special & 0x2) == 0){
 			RunStates();
 		}

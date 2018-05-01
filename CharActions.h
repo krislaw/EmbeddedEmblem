@@ -12,7 +12,7 @@
 extern uint8_t validMoves[2][maxMoves + 1]; //list of spaces a selected char can move to
 extern uint8_t validTargets[maxTargets + 1]; //list of ids the character can attack
 
-void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt);
+void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt, uint8_t id);
 bool CheckInValidMoves(uint8_t x, uint8_t y);
 
 void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range);

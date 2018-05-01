@@ -28,6 +28,8 @@ void ShowLoseScreen(void);
 void ShowWinScreen(void);
 
 void ShowStory(uint8_t chapter);
+void ShowNonCombat(void);
+void ShowWaitForServer(void);
 
 void ShowInfo(char* name, char id, uint16_t lvl,
 	uint16_t hp, uint16_t hpMax, uint16_t atk, uint16_t def,
@@ -40,6 +42,6 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 void HideTeamSelectCursor(uint8_t Index);
 void ShowTeamSelectCursor(uint8_t Index);
 
-void PrintOnTeamBuild(uint16_t * portraits[8]);
+void PrintOnTeamBuild(const uint16_t * portraits[8]);
 
 #endif /* __graphics_h */
