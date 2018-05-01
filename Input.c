@@ -16,10 +16,11 @@ Controls all buttons and Joystick Logic
 #define leftB 0x08
 #define rightB 0x20
 
-//AB on PF 3,4
+//AB on PF 4, 0
 #define Abut 0x10
-#define Bbut 0x08
+#define Bbut 0x01
 uint8_t AB;
+uint8_t newButton; //debouncing mask
 #define ABperiod 1000000
 
 //Joystick on PE 1, 2
@@ -36,11 +37,14 @@ void ButtonDisable(){
 }
 
 void ButtonInit(){ //AB: PF3, PF4
-		/* Initialize button PF 3 and 4 */	
+		/* Initialize button PF 0, 4 */	
   SYSCTL_RCGCGPIO_R |= 0x00000020;     // 1) activate clock for Port F
   while((SYSCTL_PRGPIO_R&0x20) == 0){};// ready?
+	GPIO_PORTF_LOCK_R = 0x4C4F434B;   // 2) unlock GPIO Port F
+  GPIO_PORTF_CR_R = 0x1F;
+		
   GPIO_PORTF_AMSEL_R &= ~(Abut | Bbut);      // 3) disable analog
-  GPIO_PORTF_PCTL_R &= ~0x000FF000; 				// 4) PCTL GPIO 
+  GPIO_PORTF_PCTL_R &= ~0x000F000F; 				// 4) PCTL GPIO 
   GPIO_PORTF_DIR_R &= ~(Abut | Bbut);        // 5) direction input
   GPIO_PORTF_AFSEL_R &= ~(Abut | Bbut);      // 6) regular port function
   GPIO_PORTF_DEN_R |= (Abut | Bbut);         // 7) enable digital port
@@ -53,17 +57,18 @@ void ButtonInit(){ //AB: PF3, PF4
 	NVIC_PRI7_R= (NVIC_PRI7_R& ~0xE0000)|0x00600000; // Port F, bits 23-21 current at priority 3
   NVIC_EN0_R = 0x40000000; // enable interrupt 4 in NVIC
 	AB = 0;
-		
 //	Timer0B_Init(ButtonEnable, ABperiod);
 }
 
 void GPIOPortF_Handler(void){
-  if((GPIO_PORTF_RIS_R & Abut) > 0){  // poll PE4
-    AB |= 1;                  // signal SW1 occurred
+  if((GPIO_PORTF_RIS_R & Abut) > 0){  // poll PF4
+    AB |= (1 & newButton);                  // signal SW1 occurred
   }
-  if((GPIO_PORTE_RIS_R & Bbut) > 0){  // poll PE5 
-    AB |= 2;                  // signal SW2 occurred
+  if((GPIO_PORTF_RIS_R & Bbut) > 0){  // poll PF0 
+    AB |= (2 & newButton);                  // signal SW2 occurred
   }
+	newButton = 0;
+	GPIO_PORTF_ICR_R = (Abut | Bbut);  	// acknowledge flag5
 	//ButtonDisable();
 	//Timer0B_Enable();
 }
@@ -104,6 +109,8 @@ void ADC_In23(){
   Yraw = ADC0_SSFIFO2_R&0xFFF;  // 3A) read first result
   Xraw = ADC0_SSFIFO2_R&0xFFF;  // 3B) read second result
   ADC0_ISC_R = 0x0004;             // 4) acknowledge completion
+		
+	newButton = 3;
 }
 
 

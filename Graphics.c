@@ -198,20 +198,20 @@ char * weaponString[] = {	"Sword", "Lance", "Axe", "Dragon", "Tome", "Staff", "A
 void ShowPreview(char* name, uint8_t weapon, uint16_t hpMax,
 uint16_t atk, uint16_t def, uint16_t res, uint16_t spd){
 	Output_Clear();
-	ST7735_DrawBitmap(48, 12, charPortraits[3], 32, 32);
-	ST7735_SetCursor(5, 4); //middleish of screen
+	ST7735_DrawBitmap(48, 44, charPortraits[3], 32, 32);
+	ST7735_SetCursor(7, 5); //middleish of screen
 	ST7735_OutString(name);
-	ST7735_SetCursor(5, 5);
+	ST7735_SetCursor(7, 6);
 	ST7735_OutString((char*) weaponString[weapon]);
-	ST7735_SetCursor(5, 6);
+	ST7735_SetCursor(3, 7);
 	ST7735_OutString("Hit Points: ");
 	StatOut(hpMax);
-	ST7735_SetCursor(3, 7);
+	ST7735_SetCursor(5, 9);
 	ST7735_OutString("ATK:");
 	StatOut(atk);
 	ST7735_OutString(" DEF:");
 	StatOut(def);
-	ST7735_SetCursor(8, 7);
+	ST7735_SetCursor(5, 10);
 	ST7735_OutString("RES:");
 	StatOut(res);
 	ST7735_OutString(" SPD:");
@@ -244,23 +244,23 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 
 
 const char* story[] = {
-	"Chapter 1: Desert\n\nEnemy forces gather\nin the desert\nto the west.\nYour team is\ndeployed\nto stop them.\n\nRoute the Enemy.", 
-	"Chapter 2: Valley\n\nWith the enemy\ndefeated, you\nthink yourself safe.\nAlong you path home,\nsn ambus strikes!\n\nDefend yourself!",
-	"Chapter 3: Temple\n\nYou learn a\ngreater force\nis on it's way to\nthe to the castle.\n You have to stop it!\n\nRoute the Enemy.",
-	"Chapter 4: Ruin\n\nThe ground shakes,\n the sky cracks,\nand a chasm opens\nin the earth.\nOne final battle...\n\n    Defeat Evil."
+	" Chapter 1: Desert\n\n Enemy forces gather\n     in the desert\n     to the west.\n\n      Your team is\n      deployed\n     to stop them.\n\n   Route the Enemy.", 
+	" Chapter 2: Valley\n\n With the enemy\n     defeated, you\nthink yourself safe.\n\nAlong you path home,\nsn ambus strikes!\n\nDefend yourself!",
+	" Chapter 3: Temple\n\n You learn a\n     greater force\nis on it's way to\nthe to the castle.\n\nHeroes, go forth\nand stop them!\n\nRoute the Enemy.",
+	" Chapter 4: Ruin\n\n The ground shakes,\n    the sky cracks,\nand a chasm opens\nin the earth.\nOne final battle...\n\n     Defeat the Evil."
 };
 
 void ShowStory(uint8_t chapter){
 	if(chapter > 3) { return; }
 	Output_Clear();
-	ST7735_SetCursor(0, 0);
+	ST7735_SetCursor(0, 1);
 	ST7735_OutString((char*) story[chapter]);
 }
 
  
 //cursors for team building states
-const uint16_t selectX[8] = { 0, 0, 0, 0, 6, 6, 6, 6 };
-const uint16_t selectY[8] = { 0, 4, 8, 12, 0, 4, 8, 12 };
+const uint16_t selectX[8] = { 2, 2, 2, 2, 18, 18, 18, 18 };
+const uint16_t selectY[8] = { 3, 6, 10, 14, 3, 6, 10, 14 };
 
 //height 128
 //width 64 with all
@@ -278,21 +278,21 @@ void ShowTeamSelectCursor(uint8_t Index){
 }
 
 
-#define minTBX 0
-#define maxTBX 64
-#define deltaTBX 32
-#define minTBY 0
-#define maxTBY 128
+#define minTBX 20
+#define maxTBX 65
+#define deltaTBX 44
+#define minTBY 44
+#define maxTBY 153
 #define deltaTBY 36
 
-void PrintOnTeamBuild(uint16_t ** portraits[8]){
+void PrintOnTeamBuild(uint16_t * portraits[8]){
 	Output_Clear();
-	ST7735_SetCursor(4,0);
-	ST7735_OutString("Select Your Character:");
+	ST7735_SetCursor(2,0);
+	ST7735_OutString("Choose Your Team:");
 	uint8_t x = 0;
 	for(uint16_t i = minTBX; i < maxTBX; i+= deltaTBX){
 		for(uint16_t j = minTBY; j < maxTBY; j+= deltaTBY) {
-			ST7735_DrawBitmap(i, j, portraits[0][x], 32, 32);
+			ST7735_DrawBitmap(i, j, portraits[x], 32, 32);
 			x++;
 		}
 	}

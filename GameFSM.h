@@ -38,7 +38,7 @@ struct Unit{
 	uint16_t MOV; //TODO: horses move 3, but cant go through trees
 }Unit;
 
-//TODO: balance stats bc how do???
+//TODO: balance stats bc how do?
 const struct Unit protagonists[8] = {
 	{0, 1, "Kris", lance, 20, 20, 18, 8, 11, 8, 2}, 			//use slance1
 	{0, 1, "Yuriy", lance, 18, 18, 18, 12, 2, 10, 2}, 	//use slance3

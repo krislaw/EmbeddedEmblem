@@ -40,6 +40,6 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 void HideTeamSelectCursor(uint8_t Index);
 void ShowTeamSelectCursor(uint8_t Index);
 
-void PrintOnTeamBuild(uint16_t ** portraits[8]);
+void PrintOnTeamBuild(uint16_t * portraits[8]);
 
 #endif /* __graphics_h */

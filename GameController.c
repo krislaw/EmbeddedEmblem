@@ -109,9 +109,12 @@ uint16_t IdToVector(uint16_t id){ //id for indexes to vector for alive/moved reg
 
 void UndoState(){
 	//clear any between state flags
-	
 	switch(currentState->StateNum){
-		case 1: currentState = &previewStats; break;
+		case 1:
+			currentState = &selectTeam;
+			PrintOnTeamBuild((uint16_t**) proPortraits);
+			ShowTeamSelectCursor(buildTeamIndex);
+			break;
 		case 4: 
 			PrintMapAll();
 			currentState = &scanMap; break;
@@ -124,9 +127,13 @@ void NextState(){
 //	currentState = currentState->nextState;
 		switch(currentState->StateNum){
 			case 0: currentState = &previewStats; break;
-			case 1: currentState = &addToTeam; break;
-			case 2: currentState = &selectTeam; break;
-			
+			case 1:
+				currentState = &addToTeam;
+				break;
+			case 2:
+				currentState = &selectTeam;
+				PrintOnTeamBuild((uint16_t**) proPortraits);
+				break;
 			case 3: currentState = &charSelected; break;
 			case 4: currentState = &charActionState; break;
 			case 5: currentState = &checkWin; break;
@@ -219,6 +226,13 @@ void UpdateCursor(int8_t dX, int8_t dY){
 	mapOldY = mapY;
 	//change cursor location, NO PRINTING HERE!!!	
 	switch(currentState->StateNum){
+		case 0: //selectTeam scroll
+			buildOldIndex = buildTeamIndex;
+			if(buildTeamIndex < 4 && dX > 0) { buildTeamIndex = buildTeamIndex + 4; }
+			if(buildTeamIndex > 3 && dX < 0) { buildTeamIndex = buildTeamIndex - 4; }
+			if((buildTeamIndex %  4) < 3 && dY > 0) { buildTeamIndex = buildTeamIndex + 1; }
+			if((buildTeamIndex % 4) > 0 && dY < 0) { buildTeamIndex = buildTeamIndex - 1; }
+			if(buildTeamIndex > 7) { buildTeamIndex = 0; } //if I fucked up
 		case 3: //scanMap scroll
 			if(mapX == Xmin && dX < 0){ mapX = Xmin; }
 			else if(mapX == Xmax && dX > 0){ mapX = Xmax; }
@@ -483,8 +497,9 @@ void PrintMapAll(){
 /* =========== END MAP FUNCTIONS =============*/
 
 /* ======= FUNCTIONS FOR TEAMBUILDER =============*
+* Build Team initializes this FSM
 * GenerateTeam, GenerateMap for a hard-coded quickstart 
-* selectTeam: TODO
+* TeamBuildScroll: handles scrolling through 8 protags
 * previewStats: shows info screen & asks u to confirm ur choice
 * addToTeam: TODO
 */
@@ -526,37 +541,43 @@ void GenerateMap(void) {
 	unitXLocations[5] = Xmax - 1; unitYLocations[5] = 3; unitsOnMap[Xmax - 1][3] = 5;
 }
 
-// TODO: calibrate scroll location
-
-const struct Unit * previewUnit; //used for teambuild, use id 3 for graphics
 /* BuildTeam - add new units at beginning of game and if units die */
+const struct Unit * previewUnit; //used for teambuild, use id 3 for graphics
 void BuildTeam(void){
 	currentState = &selectTeam;
-	PrintOnTeamBuild((uint16_t ***) &proPortraits);
+	PrintOnTeamBuild((uint16_t**) proPortraits);//
 	ShowTeamSelectCursor(buildTeamIndex);
 	previewUnit = &protagonists[0];
 	SetCharacterGraphics(3, (uint16_t *) proSpritesA[0], (uint16_t *) proSpritesB[0], (uint16_t *) proPortraits[0]);
 }
 
+/* Teambuild Scroll scroll through available units */
 void TeambuildScroll(void){
 	HideTeamSelectCursor(buildOldIndex);
 	ShowTeamSelectCursor(buildTeamIndex);
+	previewUnit = &protagonists[buildTeamIndex];
 	SetCharacterGraphics(3, (uint16_t *) proSpritesA[buildTeamIndex], (uint16_t *) proSpritesB[buildTeamIndex], (uint16_t *) proPortraits[buildTeamIndex]);
 }
-
+/* Preview Unit - See stats before selecting */
 void PreviewUnit(){
 	ShowPreview(previewUnit->name, previewUnit->weapon, previewUnit->MHP,
 	previewUnit->ATK, previewUnit->DEF, previewUnit->RES,	previewUnit->SPD);
+	NextState();
 }
 
 
+/* Add Unit - confirm add to team, cannot undo */
 void AddUnit(){
+	if((alive & pcVector) == pcVector) { while(1) {} } 
 	for(uint8_t i = 0; i < 3; i++){
 		if( (IdToVector(i)&alive) == 0){
 			units[i] = protagonists[buildTeamIndex];
 			SetCharacterGraphics(i, (uint16_t *) proSpritesA[buildTeamIndex], (uint16_t *) proSpritesB[buildTeamIndex],  (uint16_t *) proPortraits[buildTeamIndex]); //
+			alive |= IdToVector(i);
+			i = 3; 
 		}
 	}
+	NextState();
 }
 
 /*Game Init - sets some variables to prepare for gameplay*/
@@ -702,7 +723,7 @@ void RunGame(){
 	
 const struct State selectTeam = {0, &PreviewUnit, &EmptyFunc, &TeambuildScroll };
 const struct State previewStats = {1, &NextState, &UndoState, &EmptyFunc };
-const struct State addToTeam = {2, &NextState, &EmptyFunc, &EmptyFunc };
+const struct State addToTeam = {2, &AddUnit, &EmptyFunc, &EmptyFunc };
 
 const struct State scanMap = {3, &ScanMapA, &EmptyFunc, &ScanMapScroll};
 const struct State charSelected = {4, &ApplyTentMove, &UndoState, &TentativeMove};
