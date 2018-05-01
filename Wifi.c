@@ -1,25 +1,72 @@
-#include "..\cc3100\simplelink\include\simplelink.h"
+#include "cc3100\simplelink\include\simplelink.h"
+#include "pin_map.h"
 #include "../inc/hw_memmap.h"
 #include "../inc/hw_types.h"
-#include "../driverlib/debug.h"
-#include "../driverlib/fpu.h"
-#include "../driverlib/gpio.h"
-#include "../driverlib/pin_map.h"
-#include "../driverlib/rom.h"
-#include "../driverlib/sysctl.h"
-#include "../driverlib/uart.h"
+#include "driverlib/debug.h"
+#include "driverlib/fpu.h"
+#include "driverlib/gpio.h"
+#include "driverlib/pin_map.h"
+#include "driverlib/rom.h"
+#include "driverlib/sysctl.h"
+#include "driverlib/uart.h"
 #include "../utils/uartstdio.h"
 #include "../utils/cmdline.h"
 #include "application_commands.h"
-#include "Lab4.h"
 #include <string.h>
+#include "../inc/tm4c123gh6pm.h"
 #include "../inc/ST7735.h"
-#include "ADC.h"
 #include "simplelink.h"
-
+#define GPIO_PA1_U0TX           0x00000401
+#define MAX_LAB4_SIZE 70
+#define GPIO_PA0_U0RX           0x00000001
 
 void debugPrintf(char *);
 //#define UARTprintf(x)  debugPrintf(x)
+
+// SUBSTRING FUNCTION
+/* checks if sub is a substring of str, 0 if false 1 if true */
+uint32_t isSubstring(const char* str, const char* sub){
+	const char* p = str;
+	const char* q = sub;
+	while(*q != 0){
+		if(*p != *q){
+			return 0;
+		}
+		p++;
+		q++;
+	}
+	return 1;
+}
+
+
+//PARSE
+/* find the key in a JSON and return the value of that category*/
+void Parse(const char* bufferptr, char* data, const char* keyptr){
+	const char* p = bufferptr;
+	const char* key = keyptr;
+	
+	while(*p != 0){ //until the end of the buffer
+		
+		if(*p == *key){
+			if(isSubstring(p, key) > 0){
+		/* key has been found, return data */
+				
+				//while(*p != '\"'){ p++; }
+				while(*p != ':'){ p++; }											// " OPEN QUOTATION
+				p++;
+			for(int i = 0; i < MAX_LAB4_SIZE; i++){
+				data[i] = p[i];
+				if(data[i] == ',') {data[i] = 0; i = MAX_LAB4_SIZE; } // CLOSE QUOTATION "
+				
+				if(*p == 0) { i = MAX_LAB4_SIZE; } //don't copy overflow data
+			}
+		return;
+		} //end key found
+		}
+		p++;
+	}//end while loop
+	return;
+}
 
 //#define SSID_NAME  "valvanoAP" /* Access point name to connect to */
 #define SEC_TYPE   SL_SEC_TYPE_WPA
@@ -124,7 +171,7 @@ static int32_t configureSimpleLinkToDefaultState(char *);
 void Crash(uint32_t time){
   while(1){
     for(int i=time;i;i--){};
-    LED_RedToggle();
+    //LED_RedToggle();
   }
 }
 
@@ -151,7 +198,7 @@ void ConnectToWifi(){
  */
 // 1) change Austin Texas to your city
 // 2) you can change metric to imperial if you want temperature in F
-#define WEATHER_REQUEST "GET /data/2.5/weather?q=Austin,texas&APPID=a0a797ab17b243ef2f136e35853373a4&units=metric HTTP/1.1\r\nUser-Agent: Keil\r\nHost:api.openweathermap.org\r\nAccept: */*\r\n\r\n"
+#define WEATHER_REQUEST "POST /map HTTP/1.1\r\nUser-Agent: Keil\r\nHost: embeddedemblemjsappspot.com\r\nAccept: */*\r\n\r\n"
 // 1) go to http://openweathermap.org/appid#use 
 // 2) Register on the Sign up page
 // 3) get an API key (APPID) replace the 1234567890abcdef1234567890abcdef with your APPID
@@ -171,10 +218,8 @@ int WifiMain(void){int32_t retVal;
   INT32 ASize = 0; SlSockAddrIn_t  Addr;
   initClk();        // PLL 50 MHz
   UART_Init();      // Send data to PC, 115200 bps
-  LED_Init();       // initialize LaunchPad I/O 
+  //LED_Init();       // initialize LaunchPad I/O 
 	Output_Init(); 		//init lcd
-	ButtonInit(); 		//prepare button on PC5
-	ADC0_InitSWTriggerSeq3_Ch9(); //init our ADC
 	
 	/*
 	while(1){	// Tester for the ADC
@@ -192,11 +237,11 @@ int WifiMain(void){int32_t retVal;
 	ConnectToWifi();
 	
   while(1){
-		LED_GreenOn();
-		PollButton(); //this loop will not reset until button pushed ((debounced))
+		//LED_GreenOn();
+		//PollButton(); //this loop will not reset until button pushed ((debounced))
 		Output_Clear();
 		ST7735_SetCursor(0, 0);
-		LED_GreenOff();
+		//LED_GreenOff();
 		//1) GET WEATHER
    // strcpy(HostNameWeather,"openweathermap.org");  // used to work 10/2015
     strcpy(HostNameWeather,"api.openweathermap.org"); // works 9/2016
@@ -216,7 +261,7 @@ int WifiMain(void){int32_t retVal;
         sl_Send(SockID, SendBuff, strlen(SendBuff), 0);// Send the HTTP GET 
         sl_Recv(SockID, Recvbuff, MAX_RECV_BUFF_SIZE, 0);// Receive response 
         sl_Close(SockID);
-        LED_GreenOn();
+        //LED_GreenOn();
 				
 				//print the city name
 				static char Parsebuff[MAX_LAB4_SIZE];
@@ -235,19 +280,10 @@ int WifiMain(void){int32_t retVal;
       }
     } //end if retVal
 		
-		//3) read ADC data
-		uint32_t adcData = ADC0_InSeq3();
-		printf("%d\n", adcData);
-		ST7735_OutString("Voltage: ");
-		PrintVoltage(adcData);
-		ST7735_OutString("Resistance: ");
-		PrintResistance(adcData);
-		printf("%d\n", adcData);
 
 		//4) POST DATA
 				
 		char request[MAX_SEND_BUFF_SIZE];
-		CreateDataLoggerRequest(adcData, request, LOGGER_POST0, LOGGER_POST1, LOGGER_POST2, LOGGER_POST3);
 		strcpy(HostNameLogger,"lweather-195416.appspot.com");
     retVal = sl_NetAppDnsGetHostByName(HostNameLogger,
              strlen(HostNameLogger),&DestinationIP, SL_AF_INET);
@@ -265,7 +301,7 @@ int WifiMain(void){int32_t retVal;
         sl_Send(SockID, SendBuff, strlen(SendBuff), 0);// Send the HTTP GET 
         sl_Recv(SockID, Recvbuff, MAX_RECV_BUFF_SIZE, 0);// Receive response 
         sl_Close(SockID);
-        LED_GreenOn();
+//        LED_GreenOn();
         UARTprintf("\r\n\r\n");
 				UARTprintf("Posted Data\r\n");
       } //end retVal > 0

@@ -1,7 +1,9 @@
 #include "CharActions.h"
 #include "GameController.h"
+#include "GameFSM.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h> 
 
 uint8_t validMoves[2][maxMoves + 1];
 uint8_t validTargets[maxTargets + 1];
@@ -45,6 +47,14 @@ bool CheckInValidMoves(uint8_t x, uint8_t y){
 //list of villains the unit can attack
 void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range){ //possible to do: add a range
 	if(range != 2) {range = 1; } //range must be 1 or 2
+	uint8_t targetVal;
+	if(unitsOnMap[x][y] == PLAYER_VAL){
+		targetVal = ENEMY_VAL;
+	}
+	else{ 
+		targetVal = PLAYER_VAL;
+	}
+	
 	int16_t xmin = x;
 	int16_t xmax = x + 1;
 	uint16_t numTargets = 0;
@@ -53,7 +63,7 @@ void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range){ /
 	for(int16_t i = (y - range); i < (y + range + 1); i++){
 		for(int16_t j = xmin; j < xmax; j++){
 			if(i > 0 && i < 8 && j > -1 && j < 8){
-				if(unitsOnMap[j][i] > 2){ //is a villain
+				if(unitsOnMap[j][i] == targetVal){ //on the other team
 					validTargets[numTargets] = unitsOnMap[j][i];
 					numTargets++;
 				}
@@ -66,4 +76,61 @@ void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range){ /
 	}
 	validTargets[numTargets] = END_SENTINAL;
 	
+}
+
+uint8_t MoveEnemy(){
+		uint8_t minDist = 10;
+    uint8_t distX = 0;
+    uint8_t distY = 0;
+
+    uint8_t minServerIdx, minClientIdx;
+    uint8_t i;
+    uint8_t j;
+		//find enemy who is closest to client
+    for(i = 4; i< 8; i++){
+			if(units[i].HP<1) continue;
+        for (j = 0; j < 4; j++){
+						if(units[j].HP<1) continue;
+            uint8_t dist = pow(unitXLocations[i] - unitXLocations[j], 2) +pow(unitYLocations[i] - unitXLocations[j], 2);
+            dist = sqrt(dist);
+            if(dist<minDist){
+                minDist = dist;
+                minServerIdx = i;
+                minClientIdx = j;
+                distX = unitXLocations[i] - unitXLocations[j];
+                distY = unitYLocations[i]  - unitXLocations[j];
+               
+            }
+        }
+    }
+    
+    //move closer to client
+    uint8_t newX = unitXLocations[minServerIdx];
+    uint8_t newY = unitYLocations[minServerIdx];
+		
+		
+    for(i =0; i< units[minServerIdx].MOV; i++){
+        if(abs(distX) > 0){
+            int8_t unit = distX/distX;
+            if((unit < 0 && newX >0) || (unit > 0 && newX < 7)){
+                if(unitsOnMap[newX+unit][newY]) break; //if non zero occupied
+                newX += unit;
+                distX -= unit;
+            }
+        }else if (abs(distY) >0){
+            int8_t unit = distY/distY;
+            if ((unit < 0 && newY >0) || (unit > 0 && newY<7)){
+                if(unitsOnMap[newX][newY+unit]) break;//if non zero, occupied
+                newY += unit;
+                distY-= unit;
+            }
+        }else{ break;}
+    }
+		//save new location
+		unitsOnMap[unitXLocations[minServerIdx]][unitYLocations[minServerIdx]] = 0x00;
+		unitsOnMap[newX][newY] = 0xF1;
+		unitXLocations[minServerIdx] = newX;
+		unitYLocations[minServerIdx] = newY;
+		
+		return minServerIdx;      
 }
