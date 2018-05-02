@@ -598,7 +598,19 @@ void PrintMapAll(){
 
 
 void EnemyMove(){
-	uint8_t enemyId = MoveEnemy();
+	FindEnemyWithNearestTarget();
+	uint8_t enemyId = enemyMove[0];
+	uint8_t enemyX, enemyY;
+	uint8_t oldX = unitXLocations[enemyId];
+	uint8_t oldY = unitYLocations[enemyId];
+	
+	MoveEnemyToTarget();
+	enemyX = unitXLocations[enemyId];
+	enemyY=unitYLocations[enemyId];
+	PrintTile(oldX, oldY);
+	PrintSprite(unitsOnMap[enemyX][enemyY], enemyX, enemyY);
+	//print move
+	
 	GetValidTargets(unitXLocations[enemyId], unitYLocations[enemyId], enemyId, 1);
 	if(validTargets[0]!=END_SENTINAL){
 		CalculateCombat(enemyId, validTargets[0]);

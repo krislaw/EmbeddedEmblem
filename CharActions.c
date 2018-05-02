@@ -9,6 +9,8 @@ uint8_t validMoves[2][maxMoves + 1];
 uint8_t validTargets[maxTargets + 1];
 uint16_t numMoves;
 
+uint8_t enemyMove[2];
+
 void GetValidMoves(uint8_t x, uint8_t y, uint8_t moveAmt, uint8_t id){
 	if(moveAmt > 3) { return; } //moveAmt must be 0, 1, 2 
 	int16_t xmin = x;
@@ -78,10 +80,8 @@ void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range){ /
 	
 }
 
-uint8_t MoveEnemy(){
-		uint8_t minDist = 10;
-    uint8_t distX = 0;
-    uint8_t distY = 0;
+void FindEnemyWithNearestTarget(){
+	uint8_t minDist = 10;
 
     uint8_t minServerIdx, minClientIdx;
     uint8_t i;
@@ -97,19 +97,28 @@ uint8_t MoveEnemy(){
                 minDist = dist;
                 minServerIdx = i;
                 minClientIdx = j;
-                distX = unitXLocations[i] - unitXLocations[j];
-                distY = unitYLocations[i]  - unitXLocations[j];
                
             }
         }
     }
+		enemyMove[0]= minServerIdx;
+		enemyMove[1] = minClientIdx;
+}
+
+void MoveEnemyToTarget(){
+		uint8_t enemyIdx = enemyMove[0];
+		uint8_t targetIdx = enemyMove[1];
     
+	
+    uint8_t distX = unitXLocations[enemyIdx] - unitXLocations[targetIdx];
+    uint8_t distY = unitYLocations[enemyIdx]  - unitXLocations[targetIdx];
+	
     //move closer to client
-    uint8_t newX = unitXLocations[minServerIdx];
-    uint8_t newY = unitYLocations[minServerIdx];
+    uint8_t newX = unitXLocations[enemyIdx];
+    uint8_t newY = unitYLocations[enemyIdx];
 		
 		
-    for(i =0; i< units[minServerIdx].MOV; i++){
+    for(int i =0; i< units[enemyIdx].MOV; i++){
         if(abs(distX) > 0){
             int8_t unit = distX/distX;
             if((unit < 0 && newX >0) || (unit > 0 && newX < 7)){
@@ -127,10 +136,9 @@ uint8_t MoveEnemy(){
         }else{ break;}
     }
 		//save new location
-		unitsOnMap[unitXLocations[minServerIdx]][unitYLocations[minServerIdx]] = 0x00;
+		unitsOnMap[unitXLocations[enemyIdx]][unitYLocations[enemyIdx]] = 0x00;
 		unitsOnMap[newX][newY] = 0xF1;
-		unitXLocations[minServerIdx] = newX;
-		unitYLocations[minServerIdx] = newY;
-		
-		return minServerIdx;      
+		unitXLocations[enemyIdx] = newX;
+		unitYLocations[enemyIdx] = newY;
+		 
 }
