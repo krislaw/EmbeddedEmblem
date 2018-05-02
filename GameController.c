@@ -16,7 +16,7 @@
 
 #define numMissions 4
 #define pcVector 0x07
-#define npcVector 0xF1
+#define npcVector 0xF8
 
 /* ============= Gameplay Registers ====================
 * Values initialized at the beginning, stored until the game is restarted.
@@ -84,6 +84,7 @@ const struct State checkLose;
 //declared functions for out-of-order organization
 void PrintMapAll(void);
 void ScanMapA(void);
+void PrintOldSquare(uint8_t mx, uint8_t my);
 
 
 /* ======= GENERAL STATE MACHINE FUNCTIONS =============*
@@ -120,12 +121,15 @@ void UndoState(){
 			break;
 		case 4: 
 			currentState = &scanMap;
+			unitsOnMap[unitXLocations[selectedUnit->id]][unitYLocations[selectedUnit->id]] = selectedUnit->id;
 			PrintMapAll(); break;
 		case 5:
 			mapX = unitXLocations[selectedUnit->id];
 			mapY = unitYLocations[selectedUnit->id];
 			currentState = &charSelected;
-			PrintMapAll(); break;
+			PrintMapAll();
+			PrintSprite(selectedUnit->id, mapX, mapY);
+			break;
 		default:
 			break;
 	}
@@ -154,7 +158,8 @@ void NextState(){
 				if((moved & pcVector) == 0) { //all characters have moved
 					currentState = &waitForEnemy;
 					PrintMapAll();
-					ShowWaitForServer();
+					ShowWaitForServer(0);
+					uint8_t* moves = GetEnemyMoves(3, (uint8_t*) unitXLocations, (uint8_t*) unitYLocations, numCharacters - 3, (uint8_t*) unitXLocations + 3, (uint8_t*) unitXLocations + 3);
 				}
 				else{
 					currentState = &scanMap;
@@ -182,19 +187,19 @@ void LevelUp(uint8_t i){
 		units[i].ATK += 3;
 		units[i].DEF += 2;
 		units[i].RES += 2;
-		units[i].SPD = (units[i].SPD * 2)/10;
+		units[i].SPD += (units[i].SPD * 2)/10 + 1;
 }
 
 /* checkLose state -  */
 void CheckLose(){
 	if((alive & pcVector) == 0){
 			StopSong();
-			ShowWinScreen();
+			ShowLoseScreen();
 			SetSong(5);
 			PlaySong();
 			SysTick_Wait10ms(100);
 			while(GetButtonPush() == 0) {}
-			special |= 0x1;
+			special |= loseVector;
 	}
 	else{
 		NextState();
@@ -205,12 +210,11 @@ void CheckLose(){
 void CheckWin(){
 		if((alive & npcVector) == 0){
 			StopSong();
-			ShowWinScreen();
 			SetSong(6);
 			PlaySong();
-			SysTick_Wait10ms(100);
+			ShowWinScreen();
 			while(GetButtonPush() == 0) {}
-			currentState = &toNextMap;
+			special |= winVector;
 	}
 	else{
 		NextState();
@@ -231,6 +235,32 @@ void SysTickInit(){
   GPIO_PORTF_PCTL_R = (GPIO_PORTF_PCTL_R&0xFFFFF0FF)+0x00000000;
   GPIO_PORTF_AMSEL_R = 0;     // disable analog functionality on PF
 }
+
+/* PrintOldSquare - reprint old squares and overlapped characters */
+void PrintOldSquare(uint8_t mx, uint8_t my){
+	//reprint old squares
+	PrintTile(mx, my);
+	PrintMoveTile(mx, my);
+	//reprint people if you stood behind them
+	if(unitsOnMap[mx][my] > -1){
+		PrintSprite(unitsOnMap[mx][my], mx, my);
+	}
+	int i = 1;
+	while(unitsOnMap[mx][my + i] > -1){
+		PrintSprite(unitsOnMap[mx][my + i], mx, my + i);
+		i++;
+		if((my + i) > 7) { break; }
+	}
+	//reprint squares you stood in front of
+	PrintTile(mx, my - 1);
+	if(CheckInValidMoves(mx, my - 1)){
+		PrintMoveTile(mx, my - 1);
+	}
+	if(unitsOnMap[mx][my - 1] > -1){
+		PrintSprite(unitsOnMap[mx][my - 1], mx, my -1);
+	}	
+}
+
 
 /* ======= FUNCTIONS FOR MAP & MAP STATES =============*
 * UpdateCursor(dX, dY), UpdateInfoScreen(character id)
@@ -305,6 +335,7 @@ void ScanMapA(){
 		if((IdToVector(selectedUnit->id) & moved) == 0){
 			return; //character has already moved this turn
 		}
+		unitsOnMap[mapX][mapY] = -1;
 	}
 	else{ //not a valid character
 		return; 
@@ -350,35 +381,16 @@ void ApplyTentMove(){
 	GetValidTargets(targetX, targetY, selectedUnit->id, 1); //TODO: add range to character stats
 	//initialize for attack targets
 	attackIndex = 0;
+	while(validTargets[attackIndex] != END_SENTINAL){ attackIndex++; }
 	ShowNonCombat();
 	//go to action state
 	NextState();
 }
 
-/* Tenatative Move - finished, need to test */
+/* Tenatative Move - scroll characters move - finished, need to test */
 void TentativeMove(){
 	//Potential Bug Notice: UpdateCursor should keep in bounds pls
-	//reprint old squares
-	PrintTile(mapOldX, mapOldY);
-	PrintMoveTile(mapOldX, mapOldY);
-	//reprint people if you stood behind them
-	if(unitsOnMap[mapOldX][mapOldY] > -1){
-		PrintSprite(unitsOnMap[mapOldX][mapOldY], mapOldX, mapOldY);
-	}
-	int i = 1;
-	while(unitsOnMap[mapOldX][mapOldY + i] > -1){
-		PrintSprite(unitsOnMap[mapOldX][mapOldY + i], mapOldX, mapOldY + i);
-		i++;
-		if((mapOldY + i) > 7) { break; }
-	}
-	//reprint squares you stood in front of
-	PrintTile(mapOldX, mapOldY - 1);
-	if(CheckInValidMoves(mapOldX, mapOldY - 1)){
-		PrintMoveTile(mapOldX, mapOldY - 1);
-	}
-	if(unitsOnMap[mapOldX][mapOldY - 1] > -1){
-		PrintSprite(unitsOnMap[mapOldX][mapOldY - 1], mapOldX, mapOldY -1);
-	}	
+	PrintOldSquare(mapOldX, mapOldY);
 	PrintCursor(mapX, mapY);
 	PrintSprite(selectedUnit->id, mapX, mapY);
 }
@@ -391,8 +403,8 @@ uint16_t attackerNewHP;
 
 void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 	//damage done to each unit
-	uint16_t damage = units[attackerId].ATK;
-	uint16_t recoil = units[defenderId].ATK;
+	int16_t damage = units[attackerId].ATK;
+	int16_t recoil = units[defenderId].ATK;
 		switch(units[attackerId].weapon){
 			case tome:
 				damage-= units[defenderId].RES;
@@ -409,7 +421,7 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 			case staff:
 				recoil-= units[attackerId].RES;
 			break;
-			default: damage-= units[defenderId].DEF;
+			default: recoil -= units[attackerId].DEF;
 		}
 		//weapon triangle 
 // 1) sword > axe > lance > sword
@@ -418,64 +430,66 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 			case sword:
 				if(units[defenderId].weapon == lance){
 					damage = (damage * 3)/4;
-					recoil = (damage * 3)/2;
+					recoil = (damage * 4)/3;
 				}
 				if(units[defenderId].weapon == axe){
-					damage = (damage * 3)/2;
+					damage = (damage * 4)/3;
 					recoil = (recoil * 3)/4;
 				}
 				break;
 			case lance:
 				if(units[defenderId].weapon == axe){
 					damage = (damage * 3)/4;
-					recoil = (damage * 3)/2;
+					recoil = (damage * 4)/3;
 				}
 				if(units[defenderId].weapon == sword){
-					damage = (damage * 3)/2;
+					damage = (damage * 4)/3;
 					recoil = (recoil * 3)/4;
 				}
 				break;
 			case axe:
 				if(units[defenderId].weapon == sword){
 					damage = (damage * 3)/4;
-					recoil = (damage * 3)/2;
+					recoil = (damage * 4)/3;
 				}
 				if(units[defenderId].weapon == lance){
-					damage = (damage * 3)/2;
+					damage = (damage * 4)/3;
 				}
 				break;
 			case armor:
 				if(units[defenderId].weapon == tome){
 					damage = (damage * 3)/4;
-					recoil = (damage * 3)/2;
+					recoil = (damage * 4)/3;
 				}
 				if(units[defenderId].weapon == staff){
-					damage = (damage * 3)/2;
+					damage = (damage * 4)/3;
 					recoil = (recoil * 3)/4;
 				}
 				break;
 			case tome:
 				if(units[defenderId].weapon == staff){
 					damage = (damage * 3)/4;
-					recoil = (damage * 3)/2;
+					recoil = (damage * 4)/3;
 				}
 				if(units[defenderId].weapon == armor){
-					damage = (damage * 3)/2;
+					damage = (damage * 4)/3;
 					recoil = (recoil * 3)/4;
 				}
 				break;
 			case staff:
 				if(units[defenderId].weapon == armor){
 					damage = (damage * 3)/4;
-					recoil = (damage * 3)/2;
+					recoil = (damage * 4)/3;
 				}
 				if(units[defenderId].weapon == tome){
-					damage = (damage * 3)/2;
+					damage = (damage * 4)/3;
 					recoil = (recoil * 3)/4;
 				}
 				break;
 		}
-		if(damage == 0) { damage = 1; } //can't take 0 damage, 0 recoil is ok
+		
+		if(damage < 1) { damage = 1; } //can't take 0 damage, 0 recoil is ok
+		if(recoil < 1) { recoil = 0; } 
 		
 		//hp remaining after the combat
 		defenderNewHP = units[defenderId].HP;
@@ -500,14 +514,14 @@ void ResolveCombat(uint16_t attackerId, uint16_t defenderId){
 	
 	//mark the dead
 	if(attackerNewHP == 0) {
-		alive &= ~IdToVector(attackerId); 
-		PrintTile(unitXLocations[attackerId], unitYLocations[attackerId]);
-		PrintTile(unitXLocations[attackerId], unitYLocations[attackerId] - 1);
+		alive &= ~IdToVector(attackerId);
+		unitsOnMap[unitXLocations[attackerId]][unitYLocations[attackerId]] = -1;
+		PrintOldSquare(targetX, targetY);
 	}
 	if(defenderNewHP == 0) {
 		alive &= ~IdToVector(defenderId); 
-		PrintTile(unitXLocations[defenderId], unitYLocations[defenderId]);
-		PrintTile(unitXLocations[defenderId], unitYLocations[defenderId] - 1);
+		unitsOnMap[unitXLocations[defenderId]][unitYLocations[defenderId]] = -1;
+		PrintOldSquare(unitXLocations[defenderId], unitYLocations[defenderId]); 
 	}
 }
 
@@ -528,19 +542,21 @@ void ChangeAttackTarget(){
 }
 
 /* Select Attack Target - */
-void SelectAttackTarget(){
+void SelectAttackTarget(){	
+	//update unit's location in global, can't undo
+	moved &= ~(IdToVector(selectedUnit->id));
+	unitsOnMap[unitXLocations[selectedUnit->id]][unitYLocations[selectedUnit->id]] = -1; 
+	unitsOnMap[mapX][mapY] = selectedUnit->id;
+	unitXLocations[selectedUnit->id] = mapX;
+	unitYLocations[selectedUnit->id] = mapY;
+	
 	//write back combat changes
 	if(validTargets[attackIndex] != END_SENTINAL){
 		ResolveCombat(selectedUnit->id, validTargets[attackIndex]);
 	}
-	//do combat animations??
 	
-	//update unit's location in global, can't undo
-	moved &= ~(IdToVector(selectedUnit->id));
-	unitsOnMap[mapX][mapY] = selectedUnit->id;
-	unitsOnMap[unitXLocations[selectedUnit->id]][unitYLocations[selectedUnit->id]] = -1; 
-	unitXLocations[selectedUnit->id] = mapX;
-	unitYLocations[selectedUnit->id] = mapY;
+	//TODO: combat animations?
+	PrintOldSquare(mapOldX, mapOldY);
 	NextState();
 }
 
@@ -553,8 +569,8 @@ void PrintMapAll(){
 			}
 		}
 	}
-	UpdateInfoScreen(3);
-		if(currentState->StateNum == 4){ //move grid
+	UpdateInfoScreen(selectedUnit->id);
+	if(currentState->StateNum == 4){ //move grid
 			uint16_t i = 0;
 			while(validMoves[0][i] != END_SENTINAL){
 				PrintMoveTile(validMoves[0][i], validMoves[1][i]);
@@ -591,24 +607,27 @@ void GenerateTeam(void){
 	SetCharacterGraphics(5, (uint16_t *) &marmor1, (uint16_t *) &marmor1, (uint16_t *) &marmor1face);
 
 	numCharacters = 6;
+	alive = 0x3F;
+	moved = 0x7;
 }
 /* GenerateMap - hard coded map until map select is complete */
 void GenerateMap(void) { 
-	SetMap((const uint16_t *) &templeMap);
-	tilesOnMap = (const uint8_t *) &templeArray; 
+	SetMap((const uint16_t *) &ruinMap);
+	tilesOnMap = (const uint8_t *) &ruinArray;
+	currentState = &scanMap;
 	
 	for(int i = 0; i < 8; i++) {
 		for(int j = 0; j < 8; j++){
 			unitsOnMap[i][j] = -1;
 		}
 	}
-	unitXLocations[0] = Xmin; unitYLocations[0] = Ymax; unitsOnMap[Xmin][Ymax] = 0;
-	unitXLocations[1] = Xmin; unitYLocations[1] = Ymin; unitsOnMap[Xmin][Ymin] = 1;
-	unitXLocations[2] = Xmin + 1; unitYLocations[2] = 4; unitsOnMap[Xmin + 1][4] = 2;
+	unitXLocations[0] = 3; unitYLocations[0] = 3; unitsOnMap[3][3] = 0;
+	unitXLocations[1] = 3; unitYLocations[1] = 4; unitsOnMap[3][4] = 1;
+	unitXLocations[2] = 3; unitYLocations[2] = 5; unitsOnMap[3][5] = 2;
 	
-	unitXLocations[3] = Xmax; unitYLocations[3] = Ymax; unitsOnMap[Xmax][Ymax] = 3;
-	unitXLocations[4] = Xmax; unitYLocations[4] = Ymin; unitsOnMap[Xmax][Ymin] = 4;
-	unitXLocations[5] = Xmax - 1; unitYLocations[5] = 3; unitsOnMap[Xmax - 1][3] = 5;
+	unitXLocations[3] = 5; unitYLocations[3] = 3; unitsOnMap[5][3] = 3;
+	unitXLocations[4] = 4; unitYLocations[4] = 4; unitsOnMap[4][4] = 4;
+	unitXLocations[5] = 5; unitYLocations[5] = 5; unitsOnMap[5][5] = 5;
 }
 
 /* BuildTeam - add new units at beginning of game and if units die */
@@ -686,13 +705,13 @@ void MissionInit(uint8_t missionId){
 		case 2:
 			SetMap((const uint16_t*) &templeMap);
 			tilesOnMap = (const uint8_t *) &templeArray;
-			numCharacters = 6;
+			numCharacters = 7;
 			startLocation = (uint8_t *) &templeStart;
 			break;
 		case 3:
 			SetMap((const uint16_t*) (uint8_t *) &ruinMap);
 			tilesOnMap = (const uint8_t *) &ruinArray;
-			numCharacters = 6;
+			numCharacters = 8;
 			startLocation = (uint8_t *) &ruinStart;
 			break;
 		default:
@@ -708,7 +727,7 @@ void MissionInit(uint8_t missionId){
 		units[i] = villains[indx];
 		units[i].id = i;
 		SetCharacterGraphics(i, (uint16_t *) vilSpritesA[indx], (uint16_t *) vilSpritesB[indx], (uint16_t *) vilPortraits[indx]);
-		units[i].name = (char*) villainNames[(rand() % 30) * 6];
+		units[i].name = (char*) villainNames + ((rand() % 30) * 6);
 	}
 	
 	for(int i = 0; i < numCharacters; i++){
@@ -717,8 +736,17 @@ void MissionInit(uint8_t missionId){
 		unitsOnMap[unitXLocations[i]][unitYLocations[i]] = i;
 		alive |= (1 << i);
 	}
+	
+	//increase enemy difficulty on later missions
+	for(uint8_t j = 0; j < missionId; j++){
+			for(uint8_t k = 3; k < numCharacters; k++){
+				LevelUp(k);
+			}
+	}
+		
 	moved = pcVector; //mark all units not moved
 	currentState = &scanMap;
+	selectedUnit = &units[3];
 	PrintMapAll();
 }
 
@@ -757,7 +785,8 @@ void RunStates() {
 				CheckWin();
 				break;
 			case 7: //Wait For Enemy
-				while(1) { } //i'm in debug
+				ShowWaitForServer(1);
+				NextState();
 				break;
 			case 8: //Check Lose
 				CheckLose();
@@ -776,35 +805,41 @@ void RunGame(){
 	PlaySong();
 
 	for(int i = 0; i < numMissions; i++){
+		if((alive& pcVector) < pcVector) { //slow on printing, so don't unless we have to
 		BuildTeam();
-		while((alive & pcVector) < pcVector){
-			RunStates();
+			while((alive & pcVector) < pcVector){
+				RunStates();
+			}
 		}
 		ShowStory(i);
-		//SysTick_Wait10ms(200); //let you read story for awhile
 		while(GetButtonPush() == 0);
 		MissionInit(i);
-		while((special & 0x2) == 0){
+
+		// debug
+		/*
+		alive = 0x3F;
+		GenerateTeam();
+		GenerateMap();
+		for(int i = 0; i < 8; i++){ //check Lose testing
+			LevelUp(3);
+			LevelUp(4);
+			LevelUp(5);
+		}
+		PrintMapAll();
+		ClearButtonPush(); 
+		*/
+		// end debug
+		while((special & (winVector | loseVector)) == 0){
 			RunStates();
 		}
 		//reach here if you won the mission
-		//SysTick_Wait10ms(200); //let the win screen display for while
 		while(GetButtonPush() == 0) { }
 		LevelUp(0); //level up all units who lived
 		LevelUp(1);
 		LevelUp(2);
 	}
-
-	GenerateTeam();
-	GenerateMap();
-	
-	PrintMapAll();
-	ClearButtonPush(); //ignore buttons during initialization
-	
-	currentState = &scanMap;
-	while(1){
-		RunStates();
-	}
+	ShowStory(4); //final screen
+	while(1) { }
 }
 
 /* ==== Game Flow State Machine ====

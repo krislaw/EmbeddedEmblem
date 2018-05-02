@@ -29,7 +29,7 @@ void ShowWinScreen(void);
 
 void ShowStory(uint8_t chapter);
 void ShowNonCombat(void);
-void ShowWaitForServer(void);
+void ShowWaitForServer(uint8_t);
 
 void ShowInfo(char* name, char id, uint16_t lvl,
 	uint16_t hp, uint16_t hpMax, uint16_t atk, uint16_t def,

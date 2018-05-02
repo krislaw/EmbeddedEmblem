@@ -67,3 +67,17 @@ void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range){ /
 	validTargets[numTargets] = END_SENTINAL;
 	
 }
+
+uint8_t enemyResponse[30]; //maxNumVillains + 1 * 5 categories
+uint8_t *GetEnemyMoves(uint8_t numHero, uint8_t* xH, uint8_t* yH, uint8_t numVillain, uint8_t* xV, uint8_t* yV){
+	for(int i = 0; i < (numVillain * 5); i += 5){
+		enemyResponse[i] = i + 3; //villain's ID number
+		//TODO: @ Stephanie pls rewrite this so it works this time
+		//change the following categories to stuff
+		enemyResponse[i + 1] = xV[i]; //villains old X
+		enemyResponse[i + 2] = yV[i]; //vilains old Y
+		enemyResponse[i + 3] = 0; //0: not attacking anyone, 1: attacking someone
+		enemyResponse[i + 4] = 0; //id Number of closest hero, either 0, 1, or 2
+	}
+	return enemyResponse;
+}

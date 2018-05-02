@@ -102,14 +102,20 @@ ST7735_DrawBitmap(0, 159, (const uint16_t *) LoadScreen, 128, 160);
 
 void ShowWinScreen(){
 	Output_Clear();
-	ST7735_SetCursor(3,5);
-	ST7735_OutString("YOU WIN!");
+	ST7735_SetCursor(6,5);
+	ST7735_OutString("VICTORY!");
+	for(int i = 0; i < 3; i++){
+		PrintSprite(i, i + 3, 5);
+	}
 }
 
 void ShowLoseScreen(){
 	Output_Clear();
-	ST7735_SetCursor(3,5);
-	ST7735_OutString("YOU LOSE!");
+	ST7735_SetCursor(6,5);
+	ST7735_OutString("...DEFEATED");
+	for(int i = 3; i < 6; i++){
+		PrintSprite(i, i, 5);
+	}
 }
 
 void ShowMissionScreen(char** Missions, uint8_t numMissions){
@@ -157,10 +163,13 @@ void ShowNonCombat(){
 	ST7735_OutString("Press A to Confirm\n      Movement");	
 }
 
-void ShowWaitForServer(){
+const char* serverMessages[] = {
+	"Waiting for Enemy..", "Enemy Turn Complete"
+};
+void ShowWaitForServer(uint8_t i){
 	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
 	ST7735_SetCursor(1, 1);
-	ST7735_OutString("Waiting for Enemy..");
+	ST7735_OutString((char*) serverMessages[i]);
 }
 
 void ShowInfo(char* name, char id, uint16_t lvl,
@@ -232,34 +241,35 @@ void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
 	
 	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
 	
-	ST7735_SetCursor(1, 1);
+	ST7735_SetCursor(3, 0);
 	ST7735_OutString(attackName);
 	ST7735_OutString(" vs ");
 	ST7735_OutString(defendName);
-	ST7735_SetCursor(1, 2);
+	ST7735_SetCursor(3, 1);
 	ST7735_OutUDec(attackHP);
 	ST7735_OutChar('/');
 	ST7735_OutUDec(attackMHP);
-	ST7735_OutString("   ");
+	ST7735_OutString("    ");
 	ST7735_OutUDec(defendHP);
 	ST7735_OutChar('/');
 	ST7735_OutUDec(defendMHP);
 	if(attackHP == 0){
-		ST7735_SetCursor(1, 3);
-		ST7735_OutString("WARNING: Fatal Combat");
+		ST7735_SetCursor(0, 2);
+		ST7735_OutString("WARN: Fatal Combat");
 	}	
 }
 
 
 const char* story[] = {
 	" Chapter 1: Desert\n\n Enemy forces gather\n     in the desert\n     to the west.\n\n      Your team is\n      deployed\n     to stop them.\n\n   Route the Enemy.", 
-	" Chapter 2: Valley\n\n With the enemy\n     defeated, you\nthink yourself safe.\n\nAlong you path home,\nsn ambus strikes!\n\nDefend yourself!",
-	" Chapter 3: Temple\n\n You learn a\n     greater force\nis on it's way to\nthe to the castle.\n\nHeroes, go forth\nand stop them!\n\nRoute the Enemy.",
-	" Chapter 4: Ruin\n\n The ground shakes,\n    the sky cracks,\nand a chasm opens\nin the earth.\nOne final battle...\n\n     Defeat the Evil."
+	" Chapter 2: Valley\n\n   With the enemy\n    defeated, you\nthink yourself safe.\n\nAlong you path home,\n an ambus strikes!\n\n  Defend yourself!",
+	" Chapter 3: Temple\n\n You learn that a\n    greater force\n is on it's way to\n the to the castle.\n\n  Heroes, go forth\n  and stop them!\n\n  Route the Enemy.",
+	" Chapter 4: Ruin\n\n The ground shakes,\n  the sky cracks,\n   and a chasm opens\n    in the earth.\n\nOne final battle...\n\n  Defeat the Evil."
+	"   Epilogue: \n At long last, the\nkingdom is safe from\n the forces of evil\n\n     But...\n  Another day will\n come where heroes\n   are needed."
 };
 
 void ShowStory(uint8_t chapter){
-	if(chapter > 3) { return; }
+	if(chapter > 4) { return; }
 	Output_Clear();
 	ST7735_SetCursor(0, 1);
 	ST7735_OutString((char*) story[chapter]);

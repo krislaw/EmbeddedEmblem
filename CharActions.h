@@ -17,4 +17,6 @@ bool CheckInValidMoves(uint8_t x, uint8_t y);
 
 void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range);
 
+uint8_t* GetEnemyMoves(uint8_t numHero, uint8_t* xH, uint8_t* yH, uint8_t numVillain, uint8_t* xV, uint8_t* yV);
+
 #endif

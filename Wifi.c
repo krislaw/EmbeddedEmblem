@@ -1,4 +1,4 @@
-#include "..\cc3100\simplelink\include\simplelink.h"
+#include "./CC3100/simplelink/include/simplelink.h"
 #include "../inc/hw_memmap.h"
 #include "../inc/hw_types.h"
 #include "../driverlib/debug.h"
