@@ -779,59 +779,62 @@ void MoveEnemies(){
 		}
 	}
 	for(int i = 3; i < numCharacters; i++){ //closest move towards the enemy
-		GetValidMoves(unitXLocations[units[i].id], unitYLocations[units[i].id], units[i].MOV, units[i].id);
-		uint8_t bestX;
-		uint8_t bestY;
-		uint8_t closest = 16;
-		for(int j = 0; validMoves[0][j] != END_SENTINAL; j++){
-			uint8_t distance = AbsoluteDistance(unitXLocations[weakest->id] - validMoves[0][j], unitYLocations[weakest->id] - validMoves[1][j]);
-			if(distance < closest){
+		if((IdToVector(i) & alive) != 0){ //only move living enemies
+			GetValidMoves(unitXLocations[units[i].id], unitYLocations[units[i].id], units[i].MOV, units[i].id);
+			uint8_t bestX;
+			uint8_t bestY;
+			uint8_t closest = 16;
+			for(int j = 0; validMoves[0][j] != END_SENTINAL; j++){
+				uint8_t distance = AbsoluteDistance(unitXLocations[weakest->id] - validMoves[0][j], unitYLocations[weakest->id] - validMoves[1][j]);
+				if(distance < closest){
 					bestX = validMoves[0][j];
 					bestY = validMoves[1][j];
 					closest = distance;
-			}
-		} //end for J, generating best move
-		//move the Unit
-		unitsOnMap[unitXLocations[units[i].id]][unitYLocations[units[i].id]] = -1;
-		unitsOnMap[bestX][bestY] = units[i].id;
-		unitXLocations[units[i].id] = bestX;
-		unitYLocations[units[i].id] = bestY;
+				}
+			} //end for J, generating best move
+			//move the Unit
+			unitsOnMap[unitXLocations[units[i].id]][unitYLocations[units[i].id]] = -1;
+			unitsOnMap[bestX][bestY] = units[i].id;
+			unitXLocations[units[i].id] = bestX;
+			unitYLocations[units[i].id] = bestY;
+		}
 	}
-	
 	PrintMapAll(); //show enemies on Map
 	ShowWaitForServer(2);
 	while(GetButtonPush() == 0) {}
 	for(int i = 3; i < numCharacters; i++){
-		ShowWaitForServer(0);
-		//choose a target
-		uint8_t targetHeroId = 0;
-		bool combat = false; //can't attack anyone
-		
-		//check the cardinal directions
-		const int8_t xxa[] = { 0, 0, 1, -1 };
-		const int8_t yya[] = { 1, -1, 0, 0 };
-		for(int j = 0; j < 4; j++){
-				uint8_t xx = unitXLocations[i] + xxa[j];
-				uint8_t yy = unitYLocations[i] + yya[j];
-				if(xx < 7 && yy < 7){
-					if(unitsOnMap[xx][yy] > -1 && unitsOnMap[xx][yy] < 3){ //hero found!
-						combat = true;
-						targetHeroId = unitsOnMap[xx][yy];
+		if((IdToVector(i) & alive) != 0){
+			ShowWaitForServer(0);
+			//choose a target
+			uint8_t targetHeroId = 0;
+			bool combat = false; //can't attack anyone
+			//check the cardinal directions
+			const int8_t xxa[] = { 0, 0, 1, -1 };
+			const int8_t yya[] = { 1, -1, 0, 0 };
+			for(int j = 0; j < 4; j++){
+					uint8_t xx = unitXLocations[i] + xxa[j];
+					uint8_t yy = unitYLocations[i] + yya[j];
+					if(xx < 7 && yy < 7){
+						if(unitsOnMap[xx][yy] > -1 && unitsOnMap[xx][yy] < 3){ //hero found!
+							combat = true;
+							targetHeroId = unitsOnMap[xx][yy];
+					}
 				}
+			} //end direction checking
+			
+			if(combat){
+				//combat preview
+				CalculateCombat(i, targetHeroId);
+				ShowCombatPreview(units[targetHeroId].name, defenderNewHP, units[targetHeroId].MHP, units[i].name, attackerNewHP, units[i].MHP);
+				while(GetButtonPush() == 0) {}
+					//resolve combat
+					ResolveCombat(i, targetHeroId);
+					PrintMapAll(); //TODO: smaller graphics fixes
 			}
-		} //end direction checking
-		
-		if(combat){
-			//combat preview
-			CalculateCombat(i, targetHeroId);
-			ShowCombatPreview(units[targetHeroId].name, defenderNewHP, units[targetHeroId].MHP, units[i].name, attackerNewHP, units[i].MHP);
-			while(GetButtonPush() == 0) {}
-				//resolve combat
-				ResolveCombat(i, targetHeroId);
-				PrintMapAll(); //TODO: smaller graphics fixes
 		}
-		
-		//bug fix: just always check for kills because I don't have time to fix this
+	}
+	
+		/*	//bug fix: just always check for kills because I don't have time to fix this
 		for(int i = 3; i < numCharacters; i++){
 			if(units[i].HP < 1){
 				if(unitsOnMap[unitXLocations[i]][unitYLocations[i]] == (int16_t) units[i].id){ //signed compare
@@ -839,8 +842,7 @@ void MoveEnemies(){
 				}
 				alive &= IdToVector(i);
 			}
-		}
-	}
+		}*/
 }
 
 	/* ======== RUN FROM GAME'S MAIN WHILE LOOP ============
@@ -916,11 +918,16 @@ void RunGame(){
 			RunStates();
 		}
 		StopSong();
+		if((special & loseVector) > 0){
+			i = -1; //restart game, everyone died
+		}
+		else{
 		//reach here if you won the mission
-		while(GetButtonPush() == 0) { }
-		LevelUp(0); //level up all units who lived
-		LevelUp(1);
-		LevelUp(2);
+			while(GetButtonPush() == 0) { }
+			LevelUp(0); LevelUp(0);//level up all units who lived... x2 because it's hard to win otherwise
+			LevelUp(1); LevelUp(1);
+			LevelUp(2); LevelUp(2);
+		}
 	}
 	ShowStory(4); //final screen
 	while(1) { }
