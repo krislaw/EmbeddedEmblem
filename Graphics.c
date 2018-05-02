@@ -264,7 +264,7 @@ const char* story[] = {
 	" Chapter 1: Desert\n\n Enemy forces gather\n     in the desert\n     to the west.\n\n      Your team is\n      deployed\n     to stop them.\n\n   Route the Enemy.", 
 	" Chapter 2: Valley\n\n   With the enemy\n    defeated, you\nthink yourself safe.\n\nAlong you path home,\n an ambus strikes!\n\n  Defend yourself!",
 	" Chapter 3: Temple\n\n You learn that a\n    greater force\n is on it's way to\n the to the castle.\n\n  Heroes, go forth\n  and stop them!\n\n  Route the Enemy.",
-	" Chapter 4: Ruin\n\n The ground shakes,\n  the sky cracks,\n   and a chasm opens\n    in the earth.\n\nOne final battle...\n\n  Defeat the Evil."
+	" Chapter 4: Ruin\n\n The ground shakes,\n  the sky cracks,\n   and a chasm opens\n    in the earth.\n\nOne final battle...\n\n  Defeat the Evil.",
 	"   Epilogue: \n At long last, the\nkingdom is safe from\n the forces of evil\n\n     But...\n  Another day will\n come where heroes\n   are needed."
 };
 

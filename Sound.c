@@ -52,7 +52,7 @@ void StopSong(){
 void Timer0Task(void){	
 	waveIndex++;
 	if(waveIndex >= wavesize) { waveIndex = 0; }
-	DAC_Out(currentInstrument[waveIndex] * noteAmp / 400 );
+	DAC_Out(currentInstrument[waveIndex] * noteAmp / 800 );
 }	
 
 	/* controls envelope for each note of the song */
@@ -71,6 +71,8 @@ void Timer2Task(void){
 		Timer0A_Init((&Timer0Task), currentSong->note[noteIndex] / 2); //divide by 2 becuause those notes were for 32 wave array
 		Timer1A_Init((&Timer1Task), currentSong->noteDuration[noteIndex] >> 8);
 		Timer2A_Init((&Timer2Task), currentSong->noteDuration[noteIndex]);
+		Timer0A_Enable();
+		Timer1A_Enable();
 		if(rest == 1){
 		Timer0A_Enable();
 		Timer1A_Enable();
@@ -87,14 +89,14 @@ void Timer2Task(void){
 */
 void SetSong(uint16_t num){
 	switch(num){
-		case 0: currentSong = (struct Song *) &Main_Treble;
-		case 1: currentSong = (struct Song *) &Main_Bass;
-		case 2: currentSong = (struct Song *) &Main_Bass;
-		case 3: currentSong = (struct Song *) &Ruin;
-		case 4: currentSong = (struct Song *) &Ruin;
-		case 5: currentSong = (struct Song *) &Scales; //lose
-		case 6: currentSong = (struct Song *) &Scales; //win
-		default: currentSong = (struct Song *) &Main_Treble;
+		case 0: currentSong = (struct Song *) &Main_Treble; break;
+		//case 1: currentSong = (struct Song *) &Main_Bass; break;
+		//case 2: currentSong = (struct Song *) &Main_Bass; break;
+		case 3: currentSong = (struct Song *) &Ruin; break;
+		case 4: currentSong = (struct Song *) &Ruin; break;
+		case 5: currentSong = (struct Song *) &Scales; break; //lose
+		case 6: currentSong = (struct Song *) &Scales; break; //win
+		default: currentSong = (struct Song *) &Main_Treble; break;
 	}
 }
 
@@ -102,7 +104,7 @@ void SongInit(){
 	//setup timers with the current song
 	SetSong(15);
 	Timer0A_Init((&Timer0Task), currentSong->note[noteIndex]);
-	Timer1A_Init((&Timer1Task), currentSong->noteDuration[noteIndex] >> 10);
+	Timer1A_Init((&Timer1Task), currentSong->noteDuration[noteIndex] >> 7);
 	Timer2A_Init((&Timer2Task), currentSong->noteDuration[noteIndex]);
 }
 

@@ -802,7 +802,7 @@ void RunStates() {
 */
 
 void RunGame(){
-	for(int i = 3; i < numMissions; i++){
+	for(int i = 0; i < numMissions; i++){
 		if((alive& pcVector) < pcVector) { //slow on printing, so don't unless we have to
 		BuildTeam();
 			while((alive & pcVector) < pcVector){
