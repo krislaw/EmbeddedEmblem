@@ -22,6 +22,4 @@ void GetValidTargets(uint8_t x, uint8_t y, uint8_t attackerId, uint8_t range);
 
 //returns id of enemy to be moved
 void FindEnemyWithNearestTarget(void);
-void MoveEnemyToTarget(void);
-
 #endif

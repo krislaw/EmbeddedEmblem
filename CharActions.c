@@ -97,7 +97,6 @@ void FindEnemyWithNearestTarget(){
                 minDist = dist;
                 minServerIdx = i;
                 minClientIdx = j;
-               
             }
         }
     }
@@ -105,40 +104,4 @@ void FindEnemyWithNearestTarget(){
 		enemyMove[1] = minClientIdx;
 }
 
-void MoveEnemyToTarget(){
-		uint8_t enemyIdx = enemyMove[0];
-		uint8_t targetIdx = enemyMove[1];
-    
-	
-    uint8_t distX = unitXLocations[enemyIdx] - unitXLocations[targetIdx];
-    uint8_t distY = unitYLocations[enemyIdx]  - unitXLocations[targetIdx];
-	
-    //move closer to client
-    uint8_t newX = unitXLocations[enemyIdx];
-    uint8_t newY = unitYLocations[enemyIdx];
-		
-		
-    for(int i =0; i< units[enemyIdx].MOV; i++){
-        if(abs(distX) > 0){
-            int8_t unit = distX/distX;
-            if((unit < 0 && newX >0) || (unit > 0 && newX < 7)){
-                if(unitsOnMap[newX+unit][newY]) break; //if non zero occupied
-                newX += unit;
-                distX -= unit;
-            }
-        }else if (abs(distY) >0){
-            int8_t unit = distY/distY;
-            if ((unit < 0 && newY >0) || (unit > 0 && newY<7)){
-                if(unitsOnMap[newX][newY+unit]) break;//if non zero, occupied
-                newY += unit;
-                distY-= unit;
-            }
-        }else{ break;}
-    }
-		//save new location
-		unitsOnMap[unitXLocations[enemyIdx]][unitYLocations[enemyIdx]] = 0x00;
-		unitsOnMap[newX][newY] = 0xF1;
-		unitXLocations[enemyIdx] = newX;
-		unitYLocations[enemyIdx] = newY;
-		 
-}
+
