@@ -52,7 +52,7 @@ void StopSong(){
 void Timer0Task(void){	
 	waveIndex++;
 	if(waveIndex >= wavesize) { waveIndex = 0; }
-	DAC_Out(currentInstrument[waveIndex] * noteAmp / 1800 );
+	DAC_Out(currentInstrument[waveIndex] * noteAmp / 400 );
 }	
 
 	/* controls envelope for each note of the song */
@@ -90,12 +90,11 @@ void SetSong(uint16_t num){
 		case 0: currentSong = (struct Song *) &Main_Treble;
 		case 1: currentSong = (struct Song *) &Main_Bass;
 		case 2: currentSong = (struct Song *) &Main_Bass;
-		case 3: currentSong = (struct Song *) &Main_Bass;
-		case 4: currentSong = (struct Song *) &Main_Bass;
-		case 5: currentSong = (struct Song *) &Main_Bass;
-		case 6: currentSong = (struct Song *) &Main_Bass;
-		case 15: currentSong = (struct Song *) &Scales;
-		default: currentSong = (struct Song *) &Scales;
+		case 3: currentSong = (struct Song *) &Ruin;
+		case 4: currentSong = (struct Song *) &Ruin;
+		case 5: currentSong = (struct Song *) &Scales; //lose
+		case 6: currentSong = (struct Song *) &Scales; //win
+		default: currentSong = (struct Song *) &Main_Treble;
 	}
 }
 

@@ -46,6 +46,7 @@ void EnableInterrupts(void);  // Enable interrupts
 */
 
 void SoundTest(){
+	SetSong(6);
 	PlaySong();
 }
 
@@ -136,7 +137,7 @@ int main(void){
 
 	EnableInterrupts();
 	//DisableInterrupts();
-		
+	
 	ClearButtonPush(); //ignore presses during setup
 	while(GetButtonPush() == 0){ }
 	

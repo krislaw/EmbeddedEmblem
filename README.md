@@ -7,10 +7,10 @@ Created by @krislaw and @darnells for Valvano's EE445L class.
 ## ---> Progess
 - [x] PCB Sent for Printing 3/25/18 - krislaw
 - [x] Analog Input Drivers work 4/20/18 - krislaw
-- [ ] Write and Test software for campaign - krislaw
+- [x] Write and Test software for campaign 4/30/18 - krislaw
 - [x] Laser Cut Box for the PCB 4/23/18 - krislaw
 - [ ] Integrate server with map's "Wait for Enemy" state - darnells
-- [ ] Write and Test software for teambuild - krislaw
+- [x] Write and Test software for teambuild 5/1/18 - krislaw
 - [ ] Figure out and Implement Animations - krislaw
 
 ## ---> Software

@@ -802,9 +802,7 @@ void RunStates() {
 */
 
 void RunGame(){
-	PlaySong();
-
-	for(int i = 0; i < numMissions; i++){
+	for(int i = 3; i < numMissions; i++){
 		if((alive& pcVector) < pcVector) { //slow on printing, so don't unless we have to
 		BuildTeam();
 			while((alive & pcVector) < pcVector){
@@ -829,9 +827,12 @@ void RunGame(){
 		ClearButtonPush(); 
 		*/
 		// end debug
+		SetSong(i);
+		PlaySong();
 		while((special & (winVector | loseVector)) == 0){
 			RunStates();
 		}
+		StopSong();
 		//reach here if you won the mission
 		while(GetButtonPush() == 0) { }
 		LevelUp(0); //level up all units who lived

@@ -110,7 +110,7 @@ const uint16_t Trumpet[64] = {
 #define C5 4778   // 523.251 Hz
 #define C5s 4510   // 554.365 Hz
 #define D5 4257   // 587.330 Hz
-#define EF5 4018   // 622.254 Hz
+#define D5s 4018   // 622.254 Hz
 #define E5 3792   // 659.255 Hz
 #define F5 3579   // 698.456 Hz
 #define F5s 3378   // 739.989 Hz
@@ -275,6 +275,92 @@ const uint32_t songBattleBassMainDur[84] = {
 		eitdot, eit, eit/2, eit
 };
 
+// Song - Cloud Control
+// Arranged by Maxwell Archibald
+
+const uint32_t songRuinsNotes[246] = {
+		C5, C5, D5, C5, F5, C5, G5, C5,			// Intro
+		G5, C5, C5, F5, C5, C5, G5, C5,
+		C5, C5, D5, C5, F5, C5, G5, C5,
+		F5, C5, C5, D5, C5, C5, D5, C5,
+		
+		C5, C5, D5, C5, F5, C5, G5, C5,
+		G5, C5, C5, F5, C5, C5, G5, C5,
+		C5, C5, D5, C5, F5, C5, G5, C5,
+		F5, C5, C5, D5, C5, C5, G5s, G5,
+		
+		C4, C4, D5, C4, F5, C4, G5, C4,			// Intro Repeat
+		G5, C4, C4, F5, C4, C4, G5, C4,
+		G3s, G3s, D5, G3s, F5, G3s, G5, G3s,
+		F5, A3s, A3s, D5, A3s, A3s, D5, A3s,
+		
+		C4, C4, D5, C4, F5, C4, G5, C4,	
+		G5, C4, C4, F5, C4, C4, G5, C4,
+		G3s, G3s, D5, G3s, F5, G3s, G5, G3s,
+		F5, A3s, A3s, D5, A3s, A3s, G5s, G5,
+		
+		C5, A3s, D5, C5, D5, D5s,				// Midsection
+		G5, G5s, G5, F5, D5s, D5, D5s,
+		G5s, G5, D5, A3s, D5s, A3s,
+		D5, C5, A3s, D5, F5, C5, D5, A3s,
+		
+		C5, G4, D5, A3s, C5, C6, D6,
+		D6s, A5s, G5s, A5s, G5s, G5,
+		D5s, A3s, G5, A3s, A5s, A3s, G5,
+		G5s, G5, G5s, A5s, G5, G5s, F5, G5,
+		
+		D5s, C5, D5, C5, D5s, C5, F5, C5,			// Midsection 2
+		G5s, C5, G5, C5, D5s, C5, D5, C5, 
+		G5, A3s, D5s, A3s, D5, G4, A3s, G4,
+		F5, F4, D5, F4, A3s, G4, D5, G4,
+		
+		C5, C5, D5, C5, D5s, C5, G5, C5,
+		C6, C5, A5s, C5, G5s, C5, D5s, C5, 
+		F5, A3s, G5, A3s, A5s, G4, F5, G4,
+		G5, F4, D5, F4, A3s, G4, D5
+};
+
+const uint32_t songRuinsDur[246] = {
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 	// Intro
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 	// Intro Repeat
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit, eit/2, eit/2, eit, eit/2, eit/2, 				// Midsection
+		eit/2, eit/2, eit/2, eit/2, eit, eit/2, eit/2, 
+		eit, eit, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit/2, eit/2, eit/2, eit/2, eit, eit/2, eit/2, 
+		eit, eit, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit,
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 	// Midsection 2
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, 
+		eit/2, eit/2, eit/2, eit/2, eit/2, eit/2, eit
+};
 
 const uint32_t scalesNotes[40] = {
 	A2, B2, C3, D3,
@@ -305,6 +391,6 @@ const uint32_t scalesDur[40] = {
 /* song structs */
 const struct Song Main_Treble = { 152, (uint32_t *) songBattleTrebleMainNotes, (uint32_t *) songBattleTrebleMainDur };
 const struct Song Main_Bass = { 84, (uint32_t *) songBattleBassMainNotes, (uint32_t *) songBattleBassMainDur };
-
+const struct Song Ruin = {246, (uint32_t *) songRuinsNotes, (uint32_t *) songRuinsDur };
 const struct Song Scales = { 40, (uint32_t *) scalesNotes, (uint32_t *) scalesDur };
 
