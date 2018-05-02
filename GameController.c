@@ -505,7 +505,9 @@ void CalculateCombat(uint16_t attackerId, uint16_t defenderId){
 				attackerNewHP-=recoil;
 			}
 		}
-		
+		if(defenderNewHP == 0 && attackerNewHP == 0){ //small bug fix??
+				attackerNewHP = units[attackerId].HP;
+		}
 		return;
 }
 
@@ -539,7 +541,6 @@ void ChangeAttackTarget(){
 		CalculateCombat(selectedUnit->id, TargetId);
 		ShowCombatPreview(units[TargetId].name, 	defenderNewHP, 	units[TargetId].MHP,
 		selectedUnit->name, attackerNewHP, 	selectedUnit->MHP);
-	//TODO: reprint cursor	
 	}
 }
 
@@ -828,6 +829,16 @@ void MoveEnemies(){
 				//resolve combat
 				ResolveCombat(i, targetHeroId);
 				PrintMapAll(); //TODO: smaller graphics fixes
+		}
+		
+		//bug fix: just always check for kills because I don't have time to fix this
+		for(int i = 3; i < numCharacters; i++){
+			if(units[i].HP < 1){
+				if(unitsOnMap[unitXLocations[i]][unitYLocations[i]] == (int16_t) units[i].id){ //signed compare
+					unitsOnMap[unitXLocations[i]][unitYLocations[i]] = -1;
+				}
+				alive &= IdToVector(i);
+			}
 		}
 	}
 }
