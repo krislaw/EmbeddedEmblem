@@ -761,9 +761,7 @@ void InfoScreenTest(){
 	}
 }
 
-/* Enemy Movement Logic - replacing the server
-*
-*/
+/* Enemy Movement Logic - replacing the server */
 uint8_t AbsoluteDistance(int16_t dX, int16_t dY){
 	if(dX < 0) { dX *= (-1); }
 	if(dY < 0) { dY *= (-1); }
@@ -779,7 +777,7 @@ void MoveEnemies(){
 			lowestHP = units[i].HP;
 		}
 	}
-	for(int i = 3; i < numCharacters; i++){
+	for(int i = 3; i < numCharacters; i++){ //closest move towards the enemy
 		GetValidMoves(unitXLocations[units[i].id], unitYLocations[units[i].id], units[i].MOV, units[i].id);
 		uint8_t bestX;
 		uint8_t bestY;
@@ -802,18 +800,34 @@ void MoveEnemies(){
 	PrintMapAll(); //show enemies on Map
 	ShowWaitForServer(2);
 	while(GetButtonPush() == 0) {}
-		
 	for(int i = 3; i < numCharacters; i++){
 		ShowWaitForServer(0);
 		//choose a target
 		uint8_t targetHeroId = 0;
+		bool combat = false; //can't attack anyone
 		
-		//combat preview
-		CalculateCombat(i, targetHeroId);
-		ShowWaitForServer(2);
-		while(GetButtonPush() == 0) {}
-		//resolve combat
-		ResolveCombat(i, targetHeroId);
+		//check the cardinal directions
+		for(int dx = -1; dx < 2; dx+= 2){
+			for(int dy = -1; dy < 2; dy +=2){
+				uint8_t xx = unitXLocations[i] + dx;
+				uint8_t yy = unitYLocations[i] + dy;
+				if(xx < 7 && yy < 7){
+					if(unitsOnMap[xx][yy] > 0 && unitsOnMap[xx][yy] < 3){ //hero found!
+						combat = true;
+						targetHeroId = unitsOnMap[xx][yy];
+					}
+				}
+			}
+		} //end direction checking
+		
+		if(combat){
+			//combat preview
+			CalculateCombat(i, targetHeroId);
+			ShowWaitForServer(2);
+			while(GetButtonPush() == 0) {}
+			//resolve combat
+			ResolveCombat(i, targetHeroId);
+		}
 	}
 }
 
