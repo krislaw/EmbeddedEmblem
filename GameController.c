@@ -807,15 +807,15 @@ void MoveEnemies(){
 		bool combat = false; //can't attack anyone
 		
 		//check the cardinal directions
-		for(int dx = -1; dx < 2; dx+= 2){
-			for(int dy = -1; dy < 2; dy +=2){
-				uint8_t xx = unitXLocations[i] + dx;
-				uint8_t yy = unitYLocations[i] + dy;
+		const int8_t xxa[] = { 0, 0, 1, -1 };
+		const int8_t yya[] = { 1, -1, 0, 0 };
+		for(int j = 0; j < 4; j++){
+				uint8_t xx = unitXLocations[i] + xxa[j];
+				uint8_t yy = unitYLocations[i] + yya[j];
 				if(xx < 7 && yy < 7){
-					if(unitsOnMap[xx][yy] > 0 && unitsOnMap[xx][yy] < 3){ //hero found!
+					if(unitsOnMap[xx][yy] > -1 && unitsOnMap[xx][yy] < 3){ //hero found!
 						combat = true;
 						targetHeroId = unitsOnMap[xx][yy];
-					}
 				}
 			}
 		} //end direction checking
@@ -823,10 +823,11 @@ void MoveEnemies(){
 		if(combat){
 			//combat preview
 			CalculateCombat(i, targetHeroId);
-			ShowWaitForServer(2);
+			ShowCombatPreview(units[targetHeroId].name, defenderNewHP, units[targetHeroId].MHP, units[i].name, attackerNewHP, units[i].MHP);
 			while(GetButtonPush() == 0) {}
-			//resolve combat
-			ResolveCombat(i, targetHeroId);
+				//resolve combat
+				ResolveCombat(i, targetHeroId);
+				PrintMapAll(); //TODO: smaller graphics fixes
 		}
 	}
 }
