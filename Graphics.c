@@ -160,7 +160,7 @@ void ShowNonCombat(){
 void ShowWaitForServer(){
 	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
 	ST7735_SetCursor(1, 1);
-	ST7735_OutString("Waiting for Enemy...");	
+	ST7735_OutString("Waiting for Enemy..");
 }
 
 void ShowInfo(char* name, char id, uint16_t lvl,
