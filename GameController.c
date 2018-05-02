@@ -85,6 +85,7 @@ const struct State checkLose;
 void PrintMapAll(void);
 void ScanMapA(void);
 void PrintOldSquare(uint8_t mx, uint8_t my);
+void MoveEnemies(void);
 
 
 /* ======= GENERAL STATE MACHINE FUNCTIONS =============*
@@ -159,7 +160,8 @@ void NextState(){
 					currentState = &waitForEnemy;
 					PrintMapAll();
 					ShowWaitForServer(0);
-					uint8_t* moves = GetEnemyMoves(3, (uint8_t*) unitXLocations, (uint8_t*) unitYLocations, numCharacters - 3, (uint8_t*) unitXLocations + 3, (uint8_t*) unitXLocations + 3);
+					MoveEnemies();
+					SysTick_Wait10ms(10);
 				}
 				else{
 					currentState = &scanMap;
@@ -759,6 +761,61 @@ void InfoScreenTest(){
 	}
 }
 
+/* Enemy Movement Logic - replacing the server
+*
+*/
+uint8_t AbsoluteDistance(int16_t dX, int16_t dY){
+	if(dX < 0) { dX *= (-1); }
+	if(dY < 0) { dY *= (-1); }
+	return dY + dX;
+}
+
+void MoveEnemies(){
+	struct Unit* weakest;
+	uint16_t lowestHP = 99;
+	for(int i = 0; i < 3; i++){ //group will move toward weakest character
+		if(units[i].HP > 0 && units[i].HP < lowestHP){ //alive and weaker
+			weakest = &units[i];
+			lowestHP = units[i].HP;
+		}
+	}
+	for(int i = 3; i < numCharacters; i++){
+		GetValidMoves(unitXLocations[units[i].id], unitYLocations[units[i].id], units[i].MOV, units[i].id);
+		uint8_t bestX;
+		uint8_t bestY;
+		uint8_t closest = 16;
+		for(int j = 0; validMoves[0][j] != END_SENTINAL; j++){
+			uint8_t distance = AbsoluteDistance(unitXLocations[weakest->id] - validMoves[0][j], unitYLocations[weakest->id] - validMoves[1][j]);
+			if(distance < closest){
+					bestX = validMoves[0][j];
+					bestY = validMoves[1][j];
+					closest = distance;
+			}
+		} //end for J, generating best move
+		//move the Unit
+		unitsOnMap[unitXLocations[units[i].id]][unitYLocations[units[i].id]] = -1;
+		unitsOnMap[bestX][bestY] = units[i].id;
+		unitXLocations[units[i].id] = bestX;
+		unitYLocations[units[i].id] = bestY;
+	}
+	
+	PrintMapAll(); //show enemies on Map
+	ShowWaitForServer(2);
+	while(GetButtonPush() == 0) {}
+		
+	for(int i = 3; i < numCharacters; i++){
+		ShowWaitForServer(0);
+		//choose a target
+		uint8_t targetHeroId = 0;
+		
+		//combat preview
+		CalculateCombat(i, targetHeroId);
+		ShowWaitForServer(2);
+		while(GetButtonPush() == 0) {}
+		//resolve combat
+		ResolveCombat(i, targetHeroId);
+	}
+}
 
 	/* ======== RUN FROM GAME'S MAIN WHILE LOOP ============
 	*/

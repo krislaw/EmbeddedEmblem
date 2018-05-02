@@ -164,7 +164,7 @@ void ShowNonCombat(){
 }
 
 const char* serverMessages[] = {
-	"Waiting for Enemy..", "Enemy Turn Complete"
+	"Waiting for Enemy..", "Enemy Turn Complete", "Press A for Next"
 };
 void ShowWaitForServer(uint8_t i){
 	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
