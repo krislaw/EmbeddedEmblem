@@ -9,8 +9,9 @@ Created by @krislaw and @darnells for Valvano's EE445L class.
 - [x] Analog Input Drivers work 4/20/18 - krislaw
 - [x] Write and Test software for campaign 4/30/18 - krislaw
 - [x] Laser Cut Box for the PCB 4/23/18 - krislaw
-- [ ] Integrate server with map's "Wait for Enemy" state - darnells
+- [ ] ~~Integrate server with map's "Wait for Enemy" state - darnells~~
 - [x] Write and Test software for teambuild 5/1/18 - krislaw
+- [x] Replace Server with Enemy Logic State 5/2/18 - krislaw
 - [ ] Figure out and Implement Animations - krislaw
 
 ## ---> Software
