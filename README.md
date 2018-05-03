@@ -13,6 +13,7 @@ Created by @krislaw and @darnells for Valvano's EE445L class.
 - [x] Write and Test software for teambuild 5/1/18 - krislaw
 - [x] Replace Server with Enemy Logic State 5/2/18 - krislaw
 - [ ] Figure out and Implement Animations - krislaw
+- [ ] Add a Tutorial Level for New Players - krislaw
 
 ## ---> Software
 #### Kris wrote the initialization using Valvanoware, drivers for the speaker, joystick, and LCD, and the control flow for the game.
