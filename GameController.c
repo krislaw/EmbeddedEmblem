@@ -75,7 +75,7 @@ const struct State toNextMap;
 
 const struct State scanMap;
 const struct State charSelected;
-const struct State charActionState;
+const struct State charMoved;
 const struct State checkWin;
 const struct State waitForEnemy;
 const struct State checkLose;
@@ -153,7 +153,7 @@ void NextState(){
 				}
 				break;
 			case 3: currentState = &charSelected; break;
-			case 4: currentState = &charActionState; break;
+			case 4: currentState = &charMoved; break;
 			case 5: currentState = &checkWin; break;
 			case 6:
 				if((moved & pcVector) == 0) { //all characters have moved
@@ -268,7 +268,7 @@ void PrintOldSquare(uint8_t mx, uint8_t my){
 * UpdateCursor(dX, dY), UpdateInfoScreen(character id)
 * scanMap: onA, onScroll
 * charSelected: ApplyTentMove (A), TentativeMove (Scroll),
-* charActionState: SelectAttack Target (A), ChangeAttackTarget (Scroll), Calculate Combat for preview
+* charMoved: SelectAttack Target (A), ChangeAttackTarget (Scroll), Calculate Combat for preview
 * waitForEnemy: idle and wait for the server i guess
 */
 
@@ -309,7 +309,7 @@ void UpdateCursor(int8_t dX, int8_t dY){
 				mapY = mapY + 2*dY;
 			}
 			break;
-		case 5: //charActionState - iterate through list of enemies
+		case 5: //charMoved - iterate through list of enemies
 			if(dY > 0 && validTargets[attackIndex] != 0xFF) {
 				attackIndex++;
 			}
@@ -866,14 +866,13 @@ void RunStates() {
 		}	
 		switch(currentState->StateNum){
 		//special things for special states
-			case 6: //CheckWin
-				CheckWin();
-				break;
 			case 7: //Wait For Enemy
 				ShowWaitForServer(1);
 				NextState();
 				break;
+			case 6: //Check Win
 			case 8: //Check Lose
+				CheckWin();
 				CheckLose();
 				break;
 			default: break;
@@ -950,7 +949,7 @@ const struct State addToTeam = {2, &AddUnit, &EmptyFunc, &EmptyFunc };
 
 const struct State scanMap = {3, &ScanMapA, &EmptyFunc, &ScanMapScroll};
 const struct State charSelected = {4, &ApplyTentMove, &UndoState, &TentativeMove};
-const struct State charActionState = {5, &SelectAttackTarget, &UndoState, &ChangeAttackTarget};
+const struct State charMoved = {5, &SelectAttackTarget, &UndoState, &ChangeAttackTarget};
 const struct State checkWin = {6, &EmptyFunc, &EmptyFunc, &EmptyFunc };
 const struct State waitForEnemy = {7, &EmptyFunc, &EmptyFunc, &EmptyFunc };
 const struct State checkLose = {8, &EmptyFunc, &EmptyFunc, &EmptyFunc};

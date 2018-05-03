@@ -66,7 +66,7 @@ void Timer2Task(void){
 	noteAmp = 400;
 	noteIndex++;
 	if(noteIndex >= currentSong->numNotes) { noteIndex = 0; }
-	if(currentSong->note[noteIndex] == 0) { Timer0A_Disable(); Timer1A_Disable(); rest = 1;}
+	if(currentSong->note[noteIndex] == 0) { Timer0A_Disable(); rest = 1;}
 	else{
 		Timer0A_Init((&Timer0Task), currentSong->note[noteIndex] / 2); //divide by 2 becuause those notes were for 32 wave array
 		Timer1A_Init((&Timer1Task), currentSong->noteDuration[noteIndex] >> 8);
@@ -75,7 +75,6 @@ void Timer2Task(void){
 		Timer1A_Enable();
 		if(rest == 1){
 		Timer0A_Enable();
-		Timer1A_Enable();
 			rest = 0;
 		}
 	Timer2A_Enable();
