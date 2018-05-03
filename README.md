@@ -17,9 +17,9 @@ Created by @krislaw and @darnells for Valvano's EE445L class.
 
 ## ---> Software
 #### Kris wrote the initialization using Valvanoware, drivers for the speaker, joystick, and LCD, and the control flow for the game.
-:bangbang: COMING SOON: Tutorial on how to play
+:bangbang: Checkout Tutorial.md for a description of how to play.
 
-:zap: Did you know? You can clone my repo and change GameController.c to add your own games that will run on the circuit! :zap:
+:zap: :zap: :zap: Clone me! You can modify GameController.c and make your own games that will run on this circuit! If you make one, message us, @darnells and @krislaw would love to play it! :zap: :zap: :zap:
 
 ## ---> Hardware
 #### Kris built a gameboy-like pcb using TI's tm4c123gh6m microcontroller, a sitronix ST7735 LCD, and an arduino joystick
@@ -28,8 +28,5 @@ See **Resources/TM4Cports** for a description of the TM4C port hookups
 
 ## Preview
 :bangbang: COMING SOON: Videos/Sceenshots
-
-
-Why are you still here? Showcase isn't until May 2018...
 
 <3 <3 <3 Bye
