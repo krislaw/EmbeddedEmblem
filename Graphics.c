@@ -159,12 +159,12 @@ void StatOut(uint16_t stat){
 
 void ShowNonCombat(){
 	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
-	ST7735_SetCursor(1, 1);
-	ST7735_OutString("Press A to Confirm\n      Movement");	
+	ST7735_SetCursor(1, 0);
+	ST7735_OutString("A: Confirm Move\n B: Move elsewhere\n ^|v Attack Enemy");	
 }
 
 const char* serverMessages[] = {
-	"Waiting for Enemy..", "Enemy Turn Complete", "Press A for Next"
+	"Waiting for Enemy..", "Enemy Turn Complete", "Press A to Continue"
 };
 void ShowWaitForServer(uint8_t i){
 	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
@@ -237,25 +237,28 @@ uint16_t atk, uint16_t def, uint16_t res, uint16_t spd){
 }
 	
 void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
-	char* attackName, uint16_t attackHP, uint16_t attackMHP){
+	char* attackName, uint16_t attackHP, uint16_t attackMHP, uint8_t attackId){
 	
 	ST7735_FillRect(0, 0, 128, 32, ST7735_BLACK);
-	
-	ST7735_SetCursor(3, 0);
+		
+	ST7735_DrawBitmap(0, 31, charPortraits[attackId], 32, 32);
+		
+	ST7735_SetCursor(6, 0);
 	ST7735_OutString(attackName);
 	ST7735_OutString(" vs ");
+	ST7735_SetCursor(14, 0);
 	ST7735_OutString(defendName);
-	ST7735_SetCursor(3, 1);
+	ST7735_SetCursor(6, 1);
 	ST7735_OutUDec(attackHP);
 	ST7735_OutChar('/');
 	ST7735_OutUDec(attackMHP);
-	ST7735_OutString("    ");
+	ST7735_SetCursor(14, 1);
 	ST7735_OutUDec(defendHP);
 	ST7735_OutChar('/');
 	ST7735_OutUDec(defendMHP);
-	if(attackHP == 0){
-		ST7735_SetCursor(0, 2);
-		ST7735_OutString("WARN: Fatal Combat");
+	if(attackHP == 0 && attackId < 3){
+		ST7735_SetCursor(6, 2);
+		ST7735_OutString("WARN: Fatality");
 	}	
 }
 

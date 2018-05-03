@@ -37,7 +37,7 @@ void ShowInfo(char* name, char id, uint16_t lvl,
 void ShowPreview(char* name, uint8_t weapon, uint16_t hpMax,
 	uint16_t atk, uint16_t def, uint16_t res, uint16_t spd);
 void ShowCombatPreview(char* defendName, uint16_t defendHP, uint16_t defendMHP,
-	char* attackName, uint16_t attackHP, uint16_t attackMHP);
+	char* attackName, uint16_t attackHP, uint16_t attackMHP, uint8_t attackId);
 
 void HideTeamSelectCursor(uint8_t Index);
 void ShowTeamSelectCursor(uint8_t Index);

@@ -540,7 +540,7 @@ void ChangeAttackTarget(){
 		uint8_t TargetId = validTargets[attackIndex];
 		CalculateCombat(selectedUnit->id, TargetId);
 		ShowCombatPreview(units[TargetId].name, 	defenderNewHP, 	units[TargetId].MHP,
-		selectedUnit->name, attackerNewHP, 	selectedUnit->MHP);
+		selectedUnit->name, attackerNewHP, 	selectedUnit->MHP, selectedUnit->id);
 	}
 }
 
@@ -825,7 +825,7 @@ void MoveEnemies(){
 			if(combat){
 				//combat preview
 				CalculateCombat(i, targetHeroId);
-				ShowCombatPreview(units[targetHeroId].name, defenderNewHP, units[targetHeroId].MHP, units[i].name, attackerNewHP, units[i].MHP);
+				ShowCombatPreview(units[targetHeroId].name, defenderNewHP, units[targetHeroId].MHP, units[i].name, attackerNewHP, units[i].MHP, i);
 				while(GetButtonPush() == 0) {}
 					//resolve combat
 					ResolveCombat(i, targetHeroId);
@@ -924,9 +924,14 @@ void RunGame(){
 		else{
 		//reach here if you won the mission
 			while(GetButtonPush() == 0) { }
-			LevelUp(0); LevelUp(0);//level up all units who lived... x2 because it's hard to win otherwise
-			LevelUp(1); LevelUp(1);
-			LevelUp(2); LevelUp(2);
+			LevelUp(0);
+			LevelUp(1);
+			LevelUp(2);
+			if(i > 1){ //level up twice for harder missions
+				LevelUp(0);
+				LevelUp(1);
+				LevelUp(2);
+			}
 		}
 	}
 	ShowStory(4); //final screen
