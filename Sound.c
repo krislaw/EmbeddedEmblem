@@ -52,7 +52,7 @@ void StopSong(){
 void Timer0Task(void){	
 	waveIndex++;
 	if(waveIndex >= wavesize) { waveIndex = 0; }
-	DAC_Out(currentInstrument[waveIndex] * noteAmp / 800 );
+	DAC_Out(currentInstrument[waveIndex] * noteAmp / 600 );
 }	
 
 	/* controls envelope for each note of the song */

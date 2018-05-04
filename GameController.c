@@ -204,7 +204,7 @@ void CheckLose(){
 			special |= loseVector;
 	}
 	else{
-		NextState();
+		return;
 	}
 }
 
@@ -219,7 +219,7 @@ void CheckWin(){
 			special |= winVector;
 	}
 	else{
-		NextState();
+		return;
 	}
 }
 
@@ -874,6 +874,7 @@ void RunStates() {
 			case 8: //Check Lose
 				CheckWin();
 				CheckLose();
+				NextState();
 				break;
 			default: break;
 		} //end switch

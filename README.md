@@ -27,6 +27,6 @@ See **Resources/TM4Cports** for a description of the TM4C port hookups
 :bangbang: COMING SOON: See **Resources/???.sch** to find out how to build the circuit
 
 ## Preview
-:bangbang: COMING SOON: Videos/Sceenshots
+Watch a Video Here: https://www.youtube.com/watch?v=DZswD0Dsars
 
 <3 <3 <3 Bye
